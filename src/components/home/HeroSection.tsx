@@ -81,7 +81,7 @@ const HeroSection = () => {
                     {locations.map(location => <button key={location} onClick={() => {
                   setSelectedLocation(location);
                   setShowLocationDropdown(false);
-                }} className="w-full px-4 py-3 text-left text-sm hover:bg-secondary transition-colors first:rounded-t-xl last:rounded-b-xl">
+                }} className="w-full px-4 py-3 text-left text-sm hover:bg-secondary transition-colors first:rounded-t-xl last:rounded-b-xl text-secondary-foreground">
                         {location}
                       </button>)}
                   </div>}
