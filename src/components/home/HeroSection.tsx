@@ -111,7 +111,7 @@ const HeroSection = () => {
             <div className="text-center border-x border-white/20 text-secondary-foreground">
               <div className="flex items-center justify-center gap-1 text-2xl md:text-3xl font-bold">
                 <Star className="h-5 w-5 md:h-6 md:w-6 text-premium" />
-                <span>4.8</span>
+                <span className="text-primary-foreground">4.8</span>
               </div>
               <p className="text-xs md:text-sm text-white/70 mt-1">Average Rating</p>
             </div>
