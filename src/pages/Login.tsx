@@ -1,25 +1,106 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, Mail, Lock, Phone, ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginMethod === "phone" && !showOTP) {
-      setShowOTP(true);
-    } else {
-      // Handle login
-      console.log("Login submitted");
+    setIsLoading(true);
+
+    try {
+      if (loginMethod === "email") {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password,
+        });
+
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+
+        if (data.user) {
+          // Fetch user role to redirect appropriately
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', data.user.id)
+            .single();
+
+          toast.success("Login successful!");
+          
+          if (roleData?.role === 'worker') {
+            navigate('/worker/dashboard');
+          } else if (roleData?.role === 'agency') {
+            navigate('/agency/dashboard');
+          } else {
+            navigate('/dashboard');
+          }
+        }
+      } else if (loginMethod === "phone") {
+        if (!showOTP) {
+          // Send OTP
+          const { error } = await supabase.auth.signInWithOtp({
+            phone: `+234${phone.replace(/\s/g, '')}`,
+          });
+
+          if (error) {
+            toast.error(error.message);
+            return;
+          }
+
+          setShowOTP(true);
+          toast.success("OTP sent to your phone!");
+        } else {
+          // Verify OTP
+          const { data, error } = await supabase.auth.verifyOtp({
+            phone: `+234${phone.replace(/\s/g, '')}`,
+            token: otp,
+            type: 'sms',
+          });
+
+          if (error) {
+            toast.error(error.message);
+            return;
+          }
+
+          if (data.user) {
+            const { data: roleData } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', data.user.id)
+              .single();
+
+            toast.success("Login successful!");
+            
+            if (roleData?.role === 'worker') {
+              navigate('/worker/dashboard');
+            } else if (roleData?.role === 'agency') {
+              navigate('/agency/dashboard');
+            } else {
+              navigate('/dashboard');
+            }
+          }
+        }
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,6 +130,7 @@ const Login = () => {
           {/* Login Method Toggle */}
           <div className="flex gap-2 p-1 bg-secondary rounded-lg mb-6">
             <button
+              type="button"
               onClick={() => {
                 setLoginMethod("email");
                 setShowOTP(false);
@@ -63,6 +145,7 @@ const Login = () => {
               Email
             </button>
             <button
+              type="button"
               onClick={() => setLoginMethod("phone")}
               className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${
                 loginMethod === "phone"
@@ -89,6 +172,7 @@ const Login = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"
+                      required
                     />
                   </div>
                 </div>
@@ -108,6 +192,7 @@ const Login = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10"
+                      required
                     />
                   </div>
                 </div>
@@ -126,6 +211,7 @@ const Login = () => {
                   onChange={(e) => setOtp(e.target.value)}
                   maxLength={6}
                   className="text-center text-lg tracking-widest"
+                  required
                 />
                 <button
                   type="button"
@@ -149,14 +235,15 @@ const Login = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="pl-14"
+                    required
                   />
                 </div>
               </div>
             )}
 
-            <Button type="submit" size="lg" className="w-full gap-2">
-              {loginMethod === "phone" && !showOTP ? "Send OTP" : "Sign In"}
-              <ArrowRight className="h-4 w-4" />
+            <Button type="submit" size="lg" className="w-full gap-2" disabled={isLoading}>
+              {isLoading ? "Please wait..." : loginMethod === "phone" && !showOTP ? "Send OTP" : "Sign In"}
+              {!isLoading && <ArrowRight className="h-4 w-4" />}
             </Button>
           </form>
 

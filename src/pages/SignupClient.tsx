@@ -1,14 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, Mail, Lock, Phone, User, MapPin, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const locations = ["Lekki", "Victoria Island", "Ikoyi", "Ikeja", "Surulere", "Yaba", "Ajah"];
 
 const SignupClient = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -23,12 +27,89 @@ const SignupClient = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (step < 2) {
+      // Validate passwords match before proceeding
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+      if (formData.password.length < 6) {
+        toast.error("Password must be at least 6 characters");
+        return;
+      }
       setStep(step + 1);
-    } else {
-      console.log("Signup submitted:", formData);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: formData.fullName.trim(),
+          },
+        },
+      });
+
+      if (authError) {
+        toast.error(authError.message);
+        return;
+      }
+
+      if (authData.user) {
+        // Create profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: authData.user.id,
+            full_name: formData.fullName.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone ? `+234${formData.phone.replace(/\s/g, '')}` : null,
+            location: formData.location || null,
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+
+        // Create user role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authData.user.id,
+            role: 'client',
+          });
+
+        if (roleError) {
+          console.error('Role creation error:', roleError);
+        }
+
+        // Create wallet for the user
+        const { error: walletError } = await supabase
+          .from('wallets')
+          .insert({
+            user_id: authData.user.id,
+          });
+
+        if (walletError) {
+          console.error('Wallet creation error:', walletError);
+        }
+
+        toast.success("Account created successfully!");
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,6 +224,7 @@ const SignupClient = () => {
                       onChange={(e) => updateField("password", e.target.value)}
                       className="pl-10"
                       required
+                      minLength={6}
                     />
                   </div>
                 </div>
@@ -159,6 +241,7 @@ const SignupClient = () => {
                       onChange={(e) => updateField("confirmPassword", e.target.value)}
                       className="pl-10"
                       required
+                      minLength={6}
                     />
                   </div>
                 </div>
@@ -204,14 +287,15 @@ const SignupClient = () => {
                   variant="outline"
                   onClick={() => setStep(step - 1)}
                   className="gap-2"
+                  disabled={isLoading}
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back
                 </Button>
               )}
-              <Button type="submit" size="lg" className="flex-1 gap-2">
-                {step < 2 ? "Continue" : "Create Account"}
-                <ArrowRight className="h-4 w-4" />
+              <Button type="submit" size="lg" className="flex-1 gap-2" disabled={isLoading}>
+                {isLoading ? "Creating account..." : step < 2 ? "Continue" : "Create Account"}
+                {!isLoading && <ArrowRight className="h-4 w-4" />}
               </Button>
             </div>
           </form>
