@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,8 @@ import {
   MapPin, 
   Briefcase,
   Upload,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from "lucide-react";
 import {
   Select,
@@ -23,13 +24,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import type { Database } from "@/integrations/supabase/types";
+
+type ServiceCategory = Database["public"]["Enums"]["service_category"];
 
 const locations = [
   "Lekki", "Ajah", "Victoria Island", "Ikoyi", "Ikeja", 
   "Surulere", "Yaba", "Gbagada", "Maryland", "Magodo"
 ];
 
-const serviceTypes = [
+const serviceTypes: { id: ServiceCategory; label: string }[] = [
   { id: "nanny", label: "Nanny / Childcare" },
   { id: "housekeeper", label: "Housekeeper" },
   { id: "cleaner", label: "Cleaner" },
@@ -39,25 +45,28 @@ const serviceTypes = [
 ];
 
 const SignupWorker = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
+    password: "",
     location: "",
-    services: [] as string[],
+    services: [] as ServiceCategory[],
     experience: "",
     bio: "",
     hourlyRate: "",
     availability: "",
   });
 
-  const updateFormData = (field: string, value: string | string[]) => {
+  const updateFormData = (field: string, value: string | ServiceCategory[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const toggleService = (serviceId: string) => {
+  const toggleService = (serviceId: ServiceCategory) => {
     setFormData(prev => ({
       ...prev,
       services: prev.services.includes(serviceId)
@@ -66,12 +75,109 @@ const SignupWorker = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (step < 3) {
+      if (step === 1) {
+        if (formData.password.length < 6) {
+          toast.error("Password must be at least 6 characters");
+          return;
+        }
+      }
       setStep(step + 1);
-    } else {
-      console.log("Form submitted:", formData);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+          },
+        },
+      });
+
+      if (authError) {
+        toast.error(authError.message);
+        return;
+      }
+
+      if (authData.user) {
+        // Create profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: authData.user.id,
+            full_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+            email: formData.email.trim(),
+            phone: formData.phone ? formData.phone.trim() : null,
+            location: formData.location || null,
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+
+        // Create user role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authData.user.id,
+            role: 'worker',
+          });
+
+        if (roleError) {
+          console.error('Role creation error:', roleError);
+        }
+
+        // Create worker profile
+        const experienceMap: Record<string, number> = {
+          "0-1": 0,
+          "1-3": 2,
+          "3-5": 4,
+          "5+": 6,
+        };
+
+        const { error: workerError } = await supabase
+          .from('workers')
+          .insert({
+            user_id: authData.user.id,
+            services: formData.services.length > 0 ? formData.services : ['cleaner'],
+            bio: formData.bio || null,
+            hourly_rate: formData.hourlyRate ? parseInt(formData.hourlyRate) : null,
+            experience_years: experienceMap[formData.experience] || 0,
+            working_areas: formData.location ? [formData.location] : [],
+          });
+
+        if (workerError) {
+          console.error('Worker creation error:', workerError);
+        }
+
+        // Create wallet for the worker
+        const { error: walletError } = await supabase
+          .from('wallets')
+          .insert({
+            user_id: authData.user.id,
+          });
+
+        if (walletError) {
+          console.error('Wallet creation error:', walletError);
+        }
+
+        toast.success("Account created successfully!");
+        navigate('/worker/dashboard');
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -153,6 +259,23 @@ const SignupWorker = () => {
                     onChange={(e) => updateFormData("email", e.target.value)}
                     required
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      id="password" 
+                      type="password"
+                      placeholder="Create a password"
+                      className="pl-10"
+                      value={formData.password}
+                      onChange={(e) => updateFormData("password", e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -329,14 +452,15 @@ const SignupWorker = () => {
                   variant="outline" 
                   onClick={() => setStep(step - 1)}
                   className="flex-1"
+                  disabled={isLoading}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
                 </Button>
               )}
-              <Button type="submit" variant="accent" className="flex-1">
-                {step === 3 ? "Complete Signup" : "Continue"}
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button type="submit" variant="accent" className="flex-1" disabled={isLoading}>
+                {isLoading ? "Creating account..." : step === 3 ? "Complete Signup" : "Continue"}
+                {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </div>
           </form>

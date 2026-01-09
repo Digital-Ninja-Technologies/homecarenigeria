@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,8 @@ import {
   Mail,
   Upload,
   CheckCircle2,
-  Users
+  Users,
+  Lock
 } from "lucide-react";
 import {
   Select,
@@ -24,6 +25,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const locations = [
   "Lekki", "Ajah", "Victoria Island", "Ikoyi", "Ikeja", 
@@ -31,12 +34,15 @@ const locations = [
 ];
 
 const SignupAgency = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     agencyName: "",
     contactName: "",
     email: "",
     phone: "",
+    password: "",
     address: "",
     location: "",
     website: "",
@@ -49,12 +55,103 @@ const SignupAgency = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (step < 3) {
+      if (step === 1) {
+        if (formData.password.length < 6) {
+          toast.error("Password must be at least 6 characters");
+          return;
+        }
+      }
       setStep(step + 1);
-    } else {
-      console.log("Form submitted:", formData);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: formData.contactName.trim(),
+          },
+        },
+      });
+
+      if (authError) {
+        toast.error(authError.message);
+        return;
+      }
+
+      if (authData.user) {
+        // Create profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: authData.user.id,
+            full_name: formData.contactName.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone ? formData.phone.trim() : null,
+            location: formData.location || null,
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+
+        // Create user role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authData.user.id,
+            role: 'agency',
+          });
+
+        if (roleError) {
+          console.error('Role creation error:', roleError);
+        }
+
+        // Create agency profile
+        const { error: agencyError } = await supabase
+          .from('agencies')
+          .insert({
+            user_id: authData.user.id,
+            name: formData.agencyName.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone ? formData.phone.trim() : null,
+            address: formData.address || null,
+            website: formData.website || null,
+            description: formData.description || null,
+          });
+
+        if (agencyError) {
+          console.error('Agency creation error:', agencyError);
+        }
+
+        // Create wallet for the agency
+        const { error: walletError } = await supabase
+          .from('wallets')
+          .insert({
+            user_id: authData.user.id,
+          });
+
+        if (walletError) {
+          console.error('Wallet creation error:', walletError);
+        }
+
+        toast.success("Account created successfully!");
+        navigate('/agency/dashboard');
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -137,6 +234,23 @@ const SignupAgency = () => {
                       value={formData.email}
                       onChange={(e) => updateFormData("email", e.target.value)}
                       required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      id="password" 
+                      type="password"
+                      placeholder="Create a password"
+                      className="pl-10"
+                      value={formData.password}
+                      onChange={(e) => updateFormData("password", e.target.value)}
+                      required
+                      minLength={6}
                     />
                   </div>
                 </div>
@@ -309,14 +423,15 @@ const SignupAgency = () => {
                   variant="outline" 
                   onClick={() => setStep(step - 1)}
                   className="flex-1"
+                  disabled={isLoading}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
                 </Button>
               )}
-              <Button type="submit" className="flex-1">
-                {step === 3 ? "Submit Application" : "Continue"}
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button type="submit" className="flex-1" disabled={isLoading}>
+                {isLoading ? "Creating account..." : step === 3 ? "Submit Application" : "Continue"}
+                {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </div>
           </form>

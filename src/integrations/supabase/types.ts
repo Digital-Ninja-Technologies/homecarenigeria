@@ -415,6 +415,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      credit_worker_wallet: {
+        Args: { _amount: number; _booking_id: string }
+        Returns: boolean
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -426,6 +430,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      withdraw_from_wallet: { Args: { _amount: number }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "client" | "worker" | "agency"
