@@ -18,6 +18,7 @@ import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import WorkerDashboard from "./pages/dashboard/WorkerDashboard";
 import AgencyDashboard from "./pages/dashboard/AgencyDashboard";
 import SearchWorkers from "./pages/dashboard/search";
+import BookWorker from "./pages/dashboard/book";
 import ClientBookings from "./pages/dashboard/bookings";
 import MessagesPage from "./pages/dashboard/messages";
 import ReviewsPage from "./pages/dashboard/reviews";
@@ -54,6 +55,7 @@ const App = () => (
             {/* Client Dashboard Routes */}
             <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['client']}><ClientDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/search" element={<ProtectedRoute allowedRoles={['client']}><SearchWorkers /></ProtectedRoute>} />
+            <Route path="/dashboard/book/:workerId" element={<ProtectedRoute allowedRoles={['client']}><BookWorker /></ProtectedRoute>} />
             <Route path="/dashboard/bookings" element={<ProtectedRoute allowedRoles={['client']}><ClientBookings /></ProtectedRoute>} />
             <Route path="/dashboard/messages" element={<ProtectedRoute allowedRoles={['client']}><MessagesPage userType="client" /></ProtectedRoute>} />
             <Route path="/dashboard/reviews" element={<ProtectedRoute allowedRoles={['client']}><ReviewsPage userType="client" /></ProtectedRoute>} />
