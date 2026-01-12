@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Shield, Mail, Lock, Phone, User, MapPin, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import authBackground from "@/assets/auth-background.jpg";
 
 const locations = ["Lekki", "Victoria Island", "Ikoyi", "Ikeja", "Surulere", "Yaba", "Ajah"];
 
@@ -317,7 +318,15 @@ const SignupClient = () => {
       </div>
 
       {/* Right Side - Visual */}
-      <div className="hidden lg:flex flex-1 hero-gradient items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 items-center justify-center p-12 relative overflow-hidden">
+        {/* Background Image */}
+        <img
+          src={authBackground}
+          alt="Trusted domestic worker"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/85 to-primary/80" />
+        
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl" />
