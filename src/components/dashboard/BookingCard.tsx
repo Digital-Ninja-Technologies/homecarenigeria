@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, User, Star } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Star, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BookingCardProps {
@@ -41,7 +41,8 @@ const formatCurrency = (amount: number) => {
 };
 
 export const BookingCard = ({ booking, userType, onAction }: BookingCardProps) => {
-  const showWorkerActions = userType === 'worker' && booking.status === 'pending';
+  const showWorkerPendingActions = userType === 'worker' && booking.status === 'pending';
+  const showWorkerCompleteAction = userType === 'worker' && ['accepted', 'in_progress'].includes(booking.status);
   const showClientActions = userType === 'client' && booking.status === 'pending';
   const showReviewButton = userType === 'client' && booking.status === 'completed' && !booking.has_review;
 
@@ -82,7 +83,7 @@ export const BookingCard = ({ booking, userType, onAction }: BookingCardProps) =
           <div className="flex flex-col sm:items-end gap-2">
             <p className="font-bold text-lg">{formatCurrency(booking.amount)}</p>
 
-            {showWorkerActions && (
+            {showWorkerPendingActions && (
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -98,6 +99,17 @@ export const BookingCard = ({ booking, userType, onAction }: BookingCardProps) =
                   Accept
                 </Button>
               </div>
+            )}
+
+            {showWorkerCompleteAction && (
+              <Button
+                size="sm"
+                onClick={() => onAction?.('complete', booking.id)}
+                className="bg-accent hover:bg-accent/90"
+              >
+                <CheckCircle className="w-4 h-4 mr-1" />
+                Mark Complete
+              </Button>
             )}
 
             {showClientActions && (

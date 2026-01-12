@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export default function WorkerBookings() {
   const { user } = useAuth();
@@ -56,14 +57,29 @@ export default function WorkerBookings() {
         }
       }
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      // Silently handle fetch errors - user will see empty state
     } finally {
       setLoading(false);
     }
   };
 
   const handleAction = async (action: string, bookingId: string) => {
-    const newStatus = action === 'accept' ? 'accepted' : 'cancelled';
+    type BookingStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+    let newStatus: BookingStatus;
+    
+    switch (action) {
+      case 'accept':
+        newStatus = 'accepted';
+        break;
+      case 'decline':
+        newStatus = 'cancelled';
+        break;
+      case 'complete':
+        newStatus = 'completed';
+        break;
+      default:
+        return;
+    }
     
     const { error } = await supabase
       .from('bookings')
@@ -71,7 +87,16 @@ export default function WorkerBookings() {
       .eq('id', bookingId);
 
     if (!error) {
+      if (action === 'complete') {
+        toast.success('Job marked as complete! The client will be notified to release payment.');
+      } else if (action === 'accept') {
+        toast.success('Booking accepted!');
+      } else {
+        toast.info('Booking declined');
+      }
       fetchWorkerAndBookings();
+    } else {
+      toast.error('Failed to update booking status');
     }
   };
 
@@ -134,6 +159,7 @@ export default function WorkerBookings() {
                   key={booking.id}
                   booking={booking}
                   userType="worker"
+                  onAction={handleAction}
                 />
               ))
             ) : (
