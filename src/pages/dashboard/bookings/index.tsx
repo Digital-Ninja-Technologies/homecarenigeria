@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { createNotification, getBookingStatusMessage } from '@/lib/notifications';
 
 export default function ClientBookings() {
   const { user } = useAuth();
@@ -54,15 +56,18 @@ export default function ClientBookings() {
         const reviewedBookingIds = new Set(reviews?.map(r => r.booking_id) || []);
 
         const workerNameMap = new Map();
+        const workerUserIdMap = new Map();
         workers?.forEach(w => {
           const profile = profiles?.find(p => p.user_id === w.user_id);
           workerNameMap.set(w.id, profile?.full_name || 'Unknown');
+          workerUserIdMap.set(w.id, w.user_id);
         });
 
         setBookings(
           bookingsData.map(b => ({
             ...b,
             worker_name: workerNameMap.get(b.worker_id) || 'Unknown',
+            worker_user_id: workerUserIdMap.get(b.worker_id),
             has_review: reviewedBookingIds.has(b.id),
           }))
         );
@@ -76,13 +81,35 @@ export default function ClientBookings() {
 
   const handleAction = async (action: string, bookingId: string) => {
     if (action === 'cancel') {
+      const booking = bookings.find(b => b.id === bookingId);
+      if (!booking) return;
+
+      // Get client's name for notification
+      const { data: clientProfile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', user?.id)
+        .single();
+
       const { error } = await supabase
         .from('bookings')
         .update({ status: 'cancelled' })
         .eq('id', bookingId);
 
       if (!error) {
+        // Notify the worker about the cancellation
+        if (booking.worker_user_id) {
+          await createNotification({
+            userId: booking.worker_user_id,
+            title: 'Booking Cancelled',
+            message: `${clientProfile?.full_name || 'A client'} has cancelled their ${booking.service_type} booking.`,
+            type: 'booking',
+          });
+        }
+        toast.info('Booking cancelled');
         fetchBookings();
+      } else {
+        toast.error('Failed to cancel booking');
       }
     }
 

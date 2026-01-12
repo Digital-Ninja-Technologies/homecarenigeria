@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { createNotification, getBookingStatusMessage } from '@/lib/notifications';
 
 export default function WorkerBookings() {
   const { user } = useAuth();
@@ -80,6 +81,17 @@ export default function WorkerBookings() {
       default:
         return;
     }
+
+    // Get booking details for notification
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    // Get worker's name for notification
+    const { data: workerProfile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('user_id', user?.id)
+      .single();
     
     const { error } = await supabase
       .from('bookings')
@@ -87,6 +99,22 @@ export default function WorkerBookings() {
       .eq('id', bookingId);
 
     if (!error) {
+      // Create notification for the client
+      const { title, message } = getBookingStatusMessage(
+        newStatus,
+        true,
+        workerProfile?.full_name,
+        booking.client_name,
+        booking.service_type
+      );
+      
+      await createNotification({
+        userId: booking.client_id,
+        title,
+        message,
+        type: 'booking',
+      });
+
       if (action === 'complete') {
         toast.success('Job marked as complete! The client will be notified to release payment.');
       } else if (action === 'accept') {
