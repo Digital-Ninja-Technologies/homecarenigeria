@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { BookingCard } from '@/components/dashboard/BookingCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ReviewDialog } from '@/components/dashboard/ReviewDialog';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +11,8 @@ export default function ClientBookings() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -19,6 +22,7 @@ export default function ClientBookings() {
 
   const fetchBookings = async () => {
     try {
+      // Fetch bookings
       const { data: bookingsData } = await supabase
         .from('bookings')
         .select('*')
@@ -26,17 +30,28 @@ export default function ClientBookings() {
         .order('created_at', { ascending: false });
 
       if (bookingsData) {
+        // Fetch workers
         const workerIds = [...new Set(bookingsData.map(b => b.worker_id))];
         const { data: workers } = await supabase
           .from('workers')
           .select('id, user_id')
           .in('id', workerIds);
 
+        // Fetch profiles for worker names
         const workerUserIds = workers?.map(w => w.user_id) || [];
         const { data: profiles } = await supabase
           .from('profiles')
           .select('user_id, full_name')
           .in('user_id', workerUserIds);
+
+        // Fetch existing reviews for these bookings
+        const bookingIds = bookingsData.map(b => b.id);
+        const { data: reviews } = await supabase
+          .from('reviews')
+          .select('booking_id')
+          .in('booking_id', bookingIds);
+
+        const reviewedBookingIds = new Set(reviews?.map(r => r.booking_id) || []);
 
         const workerNameMap = new Map();
         workers?.forEach(w => {
@@ -48,6 +63,7 @@ export default function ClientBookings() {
           bookingsData.map(b => ({
             ...b,
             worker_name: workerNameMap.get(b.worker_id) || 'Unknown',
+            has_review: reviewedBookingIds.has(b.id),
           }))
         );
       }
@@ -69,6 +85,18 @@ export default function ClientBookings() {
         fetchBookings();
       }
     }
+
+    if (action === 'review') {
+      const booking = bookings.find(b => b.id === bookingId);
+      if (booking) {
+        setSelectedBooking(booking);
+        setReviewDialogOpen(true);
+      }
+    }
+  };
+
+  const handleReviewSuccess = () => {
+    fetchBookings();
   };
 
   const activeBookings = bookings.filter(b => 
@@ -130,6 +158,7 @@ export default function ClientBookings() {
                   key={booking.id}
                   booking={booking}
                   userType="client"
+                  onAction={handleAction}
                 />
               ))
             ) : (
@@ -160,6 +189,16 @@ export default function ClientBookings() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Review Dialog */}
+      {selectedBooking && (
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          booking={selectedBooking}
+          onSuccess={handleReviewSuccess}
+        />
+      )}
     </DashboardLayout>
   );
 }
