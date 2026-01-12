@@ -8,6 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useParallax } from "@/hooks/useParallax";
+import heroOurProcess from "@/assets/hero-our-process.jpg";
+import ctaOurProcess from "@/assets/cta-our-process.jpg";
 
 const vettingSteps = [
   {
@@ -140,13 +142,17 @@ const OurProcess = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative py-20 md:py-32 overflow-hidden bg-primary">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
-              backgroundSize: '40px 40px'
-            }} />
+        <section className="relative py-20 md:py-32 overflow-hidden">
+          {/* Background Image with Parallax */}
+          <div className="absolute inset-0" ref={parallaxRef}>
+            <img
+              src={heroOurProcess}
+              alt="Nigerian family with trusted domestic worker"
+              className="w-full h-full object-cover scale-110 transition-transform duration-100"
+              style={parallaxStyle}
+            />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/85 to-primary/75" />
           
           <div className="container relative text-center">
             <span className="inline-block px-4 py-1.5 bg-primary-foreground/10 rounded-full text-primary-foreground/80 text-sm font-medium mb-4">
@@ -371,8 +377,14 @@ const OurProcess = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 md:py-24 bg-primary">
-          <div className="container text-center">
+        <section className="relative py-16 md:py-24 overflow-hidden">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed"
+            style={{ backgroundImage: `url(${ctaOurProcess})` }}
+          />
+          <div className="absolute inset-0 bg-primary/90" />
+          <div className="container relative text-center">
             <h2 className="text-2xl md:text-4xl font-bold text-primary-foreground mb-4">
               Ready to Experience the Difference?
             </h2>
