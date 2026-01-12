@@ -1,54 +1,54 @@
 import { Link } from "react-router-dom";
-import { Baby, Home, Sparkles, Car, Heart, GraduationCap, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import serviceNanny from "@/assets/service-nanny.jpg";
+import serviceHousekeeper from "@/assets/service-housekeeper.jpg";
+import serviceCleaner from "@/assets/service-cleaner.jpg";
+import serviceDriver from "@/assets/service-driver.jpg";
+import serviceCaregiver from "@/assets/service-caregiver.jpg";
+import serviceTutor from "@/assets/service-tutor.jpg";
 
 const services = [
   {
     id: "nanny",
     title: "Nannies",
     description: "Caring and experienced childcare professionals for your little ones",
-    icon: Baby,
-    color: "bg-pink-50 text-pink-600",
-    iconBg: "bg-pink-100",
+    image: serviceNanny,
+    color: "from-pink-500/80 to-pink-600/80",
   },
   {
     id: "housekeeper",
     title: "Housekeepers",
     description: "Professional household management and organization",
-    icon: Home,
-    color: "bg-blue-50 text-blue-600",
-    iconBg: "bg-blue-100",
+    image: serviceHousekeeper,
+    color: "from-blue-500/80 to-blue-600/80",
   },
   {
     id: "cleaner",
     title: "Cleaners",
     description: "Thorough cleaning services for spotless homes and offices",
-    icon: Sparkles,
-    color: "bg-purple-50 text-purple-600",
-    iconBg: "bg-purple-100",
+    image: serviceCleaner,
+    color: "from-purple-500/80 to-purple-600/80",
   },
   {
     id: "driver",
     title: "Drivers",
     description: "Safe and reliable personal and family drivers",
-    icon: Car,
-    color: "bg-green-50 text-green-600",
-    iconBg: "bg-green-100",
+    image: serviceDriver,
+    color: "from-green-500/80 to-green-600/80",
   },
   {
     id: "caregiver",
     title: "Caregivers",
     description: "Compassionate care for elderly family members",
-    icon: Heart,
-    color: "bg-red-50 text-red-600",
-    iconBg: "bg-red-100",
+    image: serviceCaregiver,
+    color: "from-red-500/80 to-red-600/80",
   },
   {
     id: "tutor",
     title: "Home Tutors",
     description: "Qualified educators for personalized home learning",
-    icon: GraduationCap,
-    color: "bg-amber-50 text-amber-600",
-    iconBg: "bg-amber-100",
+    image: serviceTutor,
+    color: "from-amber-500/80 to-amber-600/80",
   },
 ];
 
@@ -67,31 +67,39 @@ const ServicesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {services.map((service, index) => {
-            const Icon = service.icon;
-            return (
-              <Link
-                key={service.id}
-                to={`/services/${service.id}`}
-                className="group relative bg-card rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50 hover:border-primary/20 animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${service.iconBg} mb-4 group-hover:scale-110 transition-transform`}>
-                  <Icon className={`h-6 w-6 ${service.color.split(" ")[1]}`} />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+          {services.map((service, index) => (
+            <Link
+              key={service.id}
+              to={`/services/${service.id}`}
+              className="group relative rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-in aspect-[4/3]"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              {/* Background Image */}
+              <img
+                src={service.image}
+                alt={service.title}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              
+              {/* Gradient Overlay */}
+              <div className={`absolute inset-0 bg-gradient-to-t ${service.color} opacity-60 group-hover:opacity-70 transition-opacity`} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              
+              {/* Content */}
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <h3 className="text-xl font-bold mb-2 group-hover:translate-y-0 transition-transform">
                   {service.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-white/90 mb-3 line-clamp-2">
                   {service.description}
                 </p>
-                <div className="flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span>Browse Workers</span>
                   <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
-              </Link>
-            );
-          })}
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
