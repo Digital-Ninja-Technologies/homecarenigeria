@@ -5,6 +5,7 @@ import WorkerCard from "@/components/workers/WorkerCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal, X, MapPin, Star, Clock, Building2, User } from "lucide-react";
+import heroServices from "@/assets/hero-services.jpg";
 
 const allWorkers = [
   {
@@ -131,12 +132,25 @@ const Services = () => {
       <Header />
       
       <main className="flex-1">
-        {/* Search Header */}
-        <div className="bg-primary py-8 md:py-12">
-          <div className="container">
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-6">
+        {/* Hero Header with Background Image */}
+        <div className="relative py-12 md:py-20">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <img
+              src={heroServices}
+              alt="Verified domestic workers team"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/90 to-primary/80" />
+          </div>
+          
+          <div className="container relative">
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">
               Find Trusted Help
             </h1>
+            <p className="text-white/80 mb-6 max-w-xl">
+              Browse our network of verified domestic workers ready to help your family
+            </p>
             
             {/* Search Bar */}
             <div className="flex gap-2">

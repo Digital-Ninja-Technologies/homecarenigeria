@@ -3,6 +3,7 @@ import Footer from "@/components/layout/Footer";
 import { Search, UserCheck, Calendar, Star, Shield, Clock, CreditCard, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import heroHowItWorks from "@/assets/hero-how-it-works.jpg";
 
 const steps = [
   {
@@ -71,8 +72,18 @@ const HowItWorks = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary via-primary to-primary/90 py-16 md:py-24">
-          <div className="container text-center">
+        <section className="relative py-16 md:py-24 overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <img
+              src={heroHowItWorks}
+              alt="Family welcoming a domestic worker"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/85 to-primary/75" />
+          </div>
+          
+          <div className="container relative text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-primary-foreground mb-4">
               How HomeCare Connect Works
             </h1>

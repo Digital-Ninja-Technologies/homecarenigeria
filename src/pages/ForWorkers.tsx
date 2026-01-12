@@ -15,6 +15,7 @@ import {
   MapPin,
   Calendar
 } from "lucide-react";
+import heroWorkers from "@/assets/hero-workers.jpg";
 
 const benefits = [
   {
@@ -88,8 +89,17 @@ const ForWorkers = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-accent via-accent to-accent/90 py-16 md:py-24">
-          <div className="container">
+        <section className="relative py-16 md:py-24 overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <img
+              src={heroWorkers}
+              alt="Successful domestic worker"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-accent/95 via-accent/85 to-accent/75" />
+          </div>
+          <div className="container relative">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <span className="inline-block px-4 py-1.5 bg-white/20 text-white text-sm font-medium rounded-full mb-4">
