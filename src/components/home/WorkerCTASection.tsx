@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Wallet, Calendar, Shield, TrendingUp } from "lucide-react";
+import { useParallax } from "@/hooks/useParallax";
+import ctaHome from "@/assets/cta-home.jpg";
 
 const benefits = [
   { icon: Wallet, text: "Earn competitive pay" },
@@ -10,13 +12,20 @@ const benefits = [
 ];
 
 const WorkerCTASection = () => {
+  const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+
   return (
-    <section className="py-16 md:py-24 hero-gradient relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 right-20 w-64 h-64 bg-white rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-20 w-80 h-80 bg-accent rounded-full blur-3xl" />
+    <section className="py-16 md:py-24 relative overflow-hidden">
+      {/* Background Image with Parallax */}
+      <div className="absolute inset-0" ref={parallaxRef}>
+        <img
+          src={ctaHome}
+          alt="Team of domestic workers"
+          className="w-full h-full object-cover scale-110 transition-transform duration-100"
+          style={parallaxStyle}
+        />
       </div>
+      <div className="absolute inset-0 hero-gradient opacity-95" />
 
       <div className="container relative">
         <div className="grid lg:grid-cols-2 gap-12 items-center">

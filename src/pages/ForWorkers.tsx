@@ -16,6 +16,7 @@ import {
   Calendar
 } from "lucide-react";
 import heroWorkers from "@/assets/hero-workers.jpg";
+import ctaWorkers from "@/assets/cta-workers.jpg";
 import { useParallax } from "@/hooks/useParallax";
 
 const benefits = [
@@ -85,6 +86,7 @@ const categories = [
 
 const ForWorkers = () => {
   const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+  const [ctaParallaxRef, ctaParallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -247,8 +249,18 @@ const ForWorkers = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 md:py-24 bg-accent">
-          <div className="container text-center">
+        <section className="relative py-16 md:py-24 overflow-hidden">
+          {/* Background Image with Parallax */}
+          <div className="absolute inset-0" ref={ctaParallaxRef}>
+            <img
+              src={ctaWorkers}
+              alt="Professional domestic worker"
+              className="w-full h-full object-cover scale-110 transition-transform duration-100"
+              style={ctaParallaxStyle}
+            />
+          </div>
+          <div className="absolute inset-0 bg-accent/90" />
+          <div className="container relative text-center">
             <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
               Ready to Start Earning?
             </h2>
