@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { to: "/services", label: "Find Help" },
   { to: "/how-it-works", label: "How It Works" },
+  { to: "/our-process", label: "Our Process" },
   { to: "/for-workers", label: "Become a Worker" },
   { to: "/for-agencies", label: "For Agencies" },
 ];
