@@ -27,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import authBackground from "@/assets/auth-background.jpg";
 
 type ServiceCategory = Database["public"]["Enums"]["service_category"];
 
@@ -476,8 +477,16 @@ const SignupWorker = () => {
       </div>
 
       {/* Right Panel - Visual */}
-      <div className="hidden lg:flex flex-col justify-center bg-gradient-to-br from-accent via-accent to-accent/90 p-12">
-        <div className="max-w-md mx-auto text-white">
+      <div className="hidden lg:flex flex-col justify-center p-12 relative overflow-hidden">
+        {/* Background Image */}
+        <img
+          src={authBackground}
+          alt="Join our team"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/90 via-accent/85 to-accent/80" />
+        
+        <div className="max-w-md mx-auto text-white relative z-10">
           <h2 className="text-3xl font-bold mb-6">Start Earning Today</h2>
           <div className="space-y-6">
             {[
