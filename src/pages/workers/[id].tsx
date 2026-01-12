@@ -99,8 +99,8 @@ export default function WorkerDetail() {
 
   const handleBookNow = () => {
     if (!user) {
-      toast.error('Please login to book a worker');
-      navigate('/login');
+      // Redirect to login with return URL to booking page
+      navigate(`/login?redirect=/book/${id}`);
       return;
     }
     if (role !== 'client') {
