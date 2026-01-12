@@ -30,6 +30,7 @@ import WorkerProfile from "./pages/worker/profile";
 import AgencyWorkers from "./pages/agency/workers";
 import AgencyProfile from "./pages/agency/profile";
 import WorkerDetail from "./pages/workers/[id]";
+import PublicBooking from "./pages/book/[id]";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/for-workers" element={<ForWorkers />} />
             <Route path="/for-agencies" element={<ForAgencies />} />
             <Route path="/workers/:id" element={<WorkerDetail />} />
+            <Route path="/book/:id" element={<PublicBooking />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup/client" element={<SignupClient />} />
             <Route path="/signup/worker" element={<SignupWorker />} />
