@@ -1,5 +1,6 @@
-import { Search, UserCheck, Calendar, CreditCard } from "lucide-react";
-
+import { Search, UserCheck, Calendar, CreditCard, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 const steps = [
   {
     icon: Search,
@@ -78,6 +79,16 @@ const HowItWorksSection = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Learn More Button */}
+        <div className="text-center mt-10">
+          <Button variant="outline" size="lg" className="gap-2" asChild>
+            <Link to="/our-process">
+              Learn More About Our Process
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
