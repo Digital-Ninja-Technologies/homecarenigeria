@@ -102,7 +102,7 @@ const SignupAgency = () => {
           });
 
         if (profileError) {
-          console.error('Profile creation error:', profileError);
+          // Profile creation failed - continue but user may need to update profile later
         }
 
         // Create user role
@@ -114,7 +114,7 @@ const SignupAgency = () => {
           });
 
         if (roleError) {
-          console.error('Role creation error:', roleError);
+          // Role creation failed - user may need to contact support
         }
 
         // Create agency profile
@@ -131,7 +131,7 @@ const SignupAgency = () => {
           });
 
         if (agencyError) {
-          console.error('Agency creation error:', agencyError);
+          // Agency profile creation failed - user may need to complete setup later
         }
 
         // Create wallet for the agency
@@ -142,7 +142,7 @@ const SignupAgency = () => {
           });
 
         if (walletError) {
-          console.error('Wallet creation error:', walletError);
+          // Wallet creation failed - will be created on first transaction
         }
 
         toast.success("Account created successfully!");

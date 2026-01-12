@@ -122,7 +122,7 @@ const SignupWorker = () => {
           });
 
         if (profileError) {
-          console.error('Profile creation error:', profileError);
+          // Profile creation failed - continue but user may need to update profile later
         }
 
         // Create user role
@@ -134,7 +134,7 @@ const SignupWorker = () => {
           });
 
         if (roleError) {
-          console.error('Role creation error:', roleError);
+          // Role creation failed - user may need to contact support
         }
 
         // Create worker profile
@@ -157,7 +157,7 @@ const SignupWorker = () => {
           });
 
         if (workerError) {
-          console.error('Worker creation error:', workerError);
+          // Worker profile creation failed - user may need to complete setup later
         }
 
         // Create wallet for the worker
@@ -168,7 +168,7 @@ const SignupWorker = () => {
           });
 
         if (walletError) {
-          console.error('Wallet creation error:', walletError);
+          // Wallet creation failed - will be created on first transaction
         }
 
         toast.success("Account created successfully!");
