@@ -8,6 +8,15 @@ import { Wallet, TrendingUp, ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+// Validation schema for withdrawal
+const withdrawalSchema = z.object({
+  amount: z.number()
+    .int('Amount must be a whole number')
+    .min(1000, 'Minimum withdrawal is ₦1,000')
+    .max(10000000, 'Maximum withdrawal is ₦10,000,000'),
+});
 
 export default function WorkerEarnings() {
   const { user } = useAuth();
@@ -44,27 +53,26 @@ export default function WorkerEarnings() {
 
       setTransactions(txData || []);
     } catch (error) {
-      console.error('Error fetching earnings:', error);
+      // Silently handle fetch errors - user will see empty state
     } finally {
       setLoading(false);
     }
   };
 
   const handleWithdraw = async () => {
-    const amount = parseInt(withdrawAmount);
-    if (!amount || amount <= 0) {
-      toast.error('Please enter a valid amount');
-      return;
-    }
-    if (amount > (wallet?.balance || 0)) {
-      toast.error('Insufficient balance');
-      return;
-    }
-
-    setWithdrawing(true);
     try {
+      // Validate with zod schema
+      const parsedAmount = parseInt(withdrawAmount);
+      const validatedData = withdrawalSchema.parse({ amount: parsedAmount });
+
+      if (validatedData.amount > (wallet?.balance || 0)) {
+        toast.error('Insufficient balance');
+        return;
+      }
+
+      setWithdrawing(true);
       const { error } = await supabase.rpc('withdraw_from_wallet', {
-        _amount: amount,
+        _amount: validatedData.amount,
       });
 
       if (error) throw error;
@@ -73,6 +81,12 @@ export default function WorkerEarnings() {
       setWithdrawAmount('');
       fetchData();
     } catch (error: any) {
+      // Handle zod validation errors
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError?.message || 'Validation failed');
+        return;
+      }
       toast.error(error.message || 'Withdrawal failed');
     } finally {
       setWithdrawing(false);
