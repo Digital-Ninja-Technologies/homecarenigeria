@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, User } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BookingCardProps {
@@ -14,8 +14,10 @@ interface BookingCardProps {
     location: string;
     status: string;
     amount: number;
+    worker_id: string;
     worker_name?: string;
     client_name?: string;
+    has_review?: boolean;
   };
   userType: 'client' | 'worker' | 'agency';
   onAction?: (action: string, bookingId: string) => void;
@@ -41,6 +43,7 @@ const formatCurrency = (amount: number) => {
 export const BookingCard = ({ booking, userType, onAction }: BookingCardProps) => {
   const showWorkerActions = userType === 'worker' && booking.status === 'pending';
   const showClientActions = userType === 'client' && booking.status === 'pending';
+  const showReviewButton = userType === 'client' && booking.status === 'completed' && !booking.has_review;
 
   return (
     <Card>
@@ -105,6 +108,23 @@ export const BookingCard = ({ booking, userType, onAction }: BookingCardProps) =
               >
                 Cancel
               </Button>
+            )}
+
+            {showReviewButton && (
+              <Button
+                size="sm"
+                onClick={() => onAction?.('review', booking.id)}
+              >
+                <Star className="w-4 h-4 mr-1" />
+                Leave Review
+              </Button>
+            )}
+
+            {userType === 'client' && booking.status === 'completed' && booking.has_review && (
+              <Badge className="bg-green-100 text-green-800">
+                <Star className="w-3 h-3 mr-1 fill-current" />
+                Reviewed
+              </Badge>
             )}
           </div>
         </div>
