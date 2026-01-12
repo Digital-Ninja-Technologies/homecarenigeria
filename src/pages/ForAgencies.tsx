@@ -19,6 +19,7 @@ import heroAgencies from "@/assets/hero-agencies.jpg";
 import ctaAgencies from "@/assets/cta-agencies.jpg";
 import { useParallax } from "@/hooks/useParallax";
 import AgencyTestimonialsCarousel from "@/components/agencies/AgencyTestimonialsCarousel";
+import AgencyFAQ from "@/components/agencies/AgencyFAQ";
 
 const benefits = [
   {
@@ -324,6 +325,9 @@ const ForAgencies = () => {
             </div>
           </div>
         </section>
+
+        {/* FAQ Section */}
+        <AgencyFAQ />
 
         {/* CTA Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
