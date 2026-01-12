@@ -4,6 +4,7 @@ import { Search, UserCheck, Calendar, Star, Shield, Clock, CreditCard, MessageCi
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import heroHowItWorks from "@/assets/hero-how-it-works.jpg";
+import { useParallax } from "@/hooks/useParallax";
 
 const steps = [
   {
@@ -66,6 +67,8 @@ const features = [
 ];
 
 const HowItWorks = () => {
+  const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -73,15 +76,16 @@ const HowItWorks = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
+          {/* Background Image with Parallax */}
+          <div className="absolute inset-0" ref={parallaxRef}>
             <img
               src={heroHowItWorks}
               alt="Family welcoming a domestic worker"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover scale-110 transition-transform duration-100"
+              style={parallaxStyle}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/85 to-primary/75" />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/85 to-primary/75" />
           
           <div className="container relative text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-primary-foreground mb-4">

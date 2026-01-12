@@ -16,6 +16,7 @@ import {
   Calendar
 } from "lucide-react";
 import heroWorkers from "@/assets/hero-workers.jpg";
+import { useParallax } from "@/hooks/useParallax";
 
 const benefits = [
   {
@@ -83,6 +84,8 @@ const categories = [
 ];
 
 const ForWorkers = () => {
+  const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -90,15 +93,16 @@ const ForWorkers = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
+          {/* Background Image with Parallax */}
+          <div className="absolute inset-0" ref={parallaxRef}>
             <img
               src={heroWorkers}
               alt="Successful domestic worker"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover scale-110 transition-transform duration-100"
+              style={parallaxStyle}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-accent/95 via-accent/85 to-accent/75" />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-accent/95 via-accent/85 to-accent/75" />
           <div className="container relative">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>

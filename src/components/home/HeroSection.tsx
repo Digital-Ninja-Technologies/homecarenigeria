@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Shield, Star, Users, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroFamily from "@/assets/hero-family.jpg";
+import { useParallax } from "@/hooks/useParallax";
 
 const services = ["Nanny", "Housekeeper", "Cleaner", "Driver", "Caregiver", "Home Tutor"];
 const locations = ["Lekki", "Victoria Island", "Ikoyi", "Ikeja", "Surulere", "Yaba", "Ajah"];
@@ -12,20 +13,22 @@ const HeroSection = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
   
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
-      {/* Background Image */}
-      <div className="absolute inset-0">
+      {/* Background Image with Parallax */}
+      <div className="absolute inset-0" ref={parallaxRef}>
         <img
           src={heroFamily}
           alt="Happy Nigerian family with their trusted caregiver"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover scale-110 transition-transform duration-100"
+          style={parallaxStyle}
         />
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/70" />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-primary/40" />
       </div>
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/70" />
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-primary/40" />
 
       {/* Decorative elements */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">

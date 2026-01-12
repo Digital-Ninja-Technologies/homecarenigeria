@@ -16,6 +16,7 @@ import {
   Headphones
 } from "lucide-react";
 import heroAgencies from "@/assets/hero-agencies.jpg";
+import { useParallax } from "@/hooks/useParallax";
 
 const benefits = [
   {
@@ -105,6 +106,8 @@ const stats = [
 ];
 
 const ForAgencies = () => {
+  const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -112,15 +115,16 @@ const ForAgencies = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
+          {/* Background Image with Parallax */}
+          <div className="absolute inset-0" ref={parallaxRef}>
             <img
               src={heroAgencies}
               alt="Agency team meeting"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover scale-110 transition-transform duration-100"
+              style={parallaxStyle}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/90 to-primary/80" />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/90 to-primary/80" />
           <div className="container relative">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
