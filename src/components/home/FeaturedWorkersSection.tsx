@@ -2,11 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import WorkerCard from "@/components/workers/WorkerCard";
+import workerChioma from "@/assets/worker-chioma.jpg";
+import workerAdebayo from "@/assets/worker-adebayo.jpg";
+import workerBlessing from "@/assets/worker-blessing.jpg";
+import workerSamuel from "@/assets/worker-samuel.jpg";
 
 const featuredWorkers = [
   {
     id: "1",
     name: "Chioma Eze",
+    photo: workerChioma,
     role: "Professional Nanny",
     experience: "5 years exp",
     location: "Lekki",
@@ -20,6 +25,7 @@ const featuredWorkers = [
   {
     id: "2",
     name: "Adebayo Ogundimu",
+    photo: workerAdebayo,
     role: "Personal Driver",
     experience: "8 years exp",
     location: "Victoria Island",
@@ -33,6 +39,7 @@ const featuredWorkers = [
   {
     id: "3",
     name: "Blessing Okoro",
+    photo: workerBlessing,
     role: "Housekeeper",
     experience: "4 years exp",
     location: "Ikoyi",
@@ -46,6 +53,7 @@ const featuredWorkers = [
   {
     id: "4",
     name: "Samuel Adeniyi",
+    photo: workerSamuel,
     role: "Elderly Caregiver",
     experience: "6 years exp",
     location: "Ikeja",
