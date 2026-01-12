@@ -16,6 +16,7 @@ import {
   Headphones
 } from "lucide-react";
 import heroAgencies from "@/assets/hero-agencies.jpg";
+import ctaAgencies from "@/assets/cta-agencies.jpg";
 import { useParallax } from "@/hooks/useParallax";
 
 const benefits = [
@@ -107,6 +108,7 @@ const stats = [
 
 const ForAgencies = () => {
   const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+  const [ctaParallaxRef, ctaParallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -320,8 +322,18 @@ const ForAgencies = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 md:py-24 bg-primary">
-          <div className="container text-center">
+        <section className="relative py-16 md:py-24 overflow-hidden">
+          {/* Background Image with Parallax */}
+          <div className="absolute inset-0" ref={ctaParallaxRef}>
+            <img
+              src={ctaAgencies}
+              alt="Business partnership"
+              className="w-full h-full object-cover scale-110 transition-transform duration-100"
+              style={ctaParallaxStyle}
+            />
+          </div>
+          <div className="absolute inset-0 bg-primary/90" />
+          <div className="container relative text-center">
             <h2 className="text-2xl md:text-4xl font-bold text-primary-foreground mb-4">
               Ready to Grow Your Agency?
             </h2>
