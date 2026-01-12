@@ -1,4 +1,7 @@
 import { Star, Quote } from "lucide-react";
+import testimonialAdaeze from "@/assets/testimonial-adaeze.jpg";
+import testimonialEmeka from "@/assets/testimonial-emeka.jpg";
+import testimonialFolake from "@/assets/testimonial-folake.jpg";
 
 const testimonials = [
   {
@@ -7,7 +10,7 @@ const testimonials = [
     role: "Working Mother, Lekki",
     content: "Finding a reliable nanny used to be so stressful. HomeCare Connect made it easy - I found a wonderful, verified nanny within a week. The verification process gave me peace of mind.",
     rating: 5,
-    avatar: "AO",
+    image: testimonialAdaeze,
   },
   {
     id: 2,
@@ -15,7 +18,7 @@ const testimonials = [
     role: "Business Owner, Victoria Island",
     content: "We needed a driver and housekeeper for our family. The platform's escrow system means I only pay when satisfied. The workers we found are professional and trustworthy.",
     rating: 5,
-    avatar: "EN",
+    image: testimonialEmeka,
   },
   {
     id: 3,
@@ -23,7 +26,7 @@ const testimonials = [
     role: "Caregiver, Ikeja",
     content: "As a caregiver, this platform has transformed my career. I get consistent bookings, secure payments, and the verification badge helps families trust me immediately.",
     rating: 5,
-    avatar: "FA",
+    image: testimonialFolake,
   },
 ];
 
@@ -67,9 +70,11 @@ const TestimonialsSection = () => {
 
               {/* Author */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                  {testimonial.avatar}
-                </div>
+                <img
+                  src={testimonial.image}
+                  alt={testimonial.name}
+                  className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/10"
+                />
                 <div>
                   <p className="font-semibold text-foreground text-sm">
                     {testimonial.name}
