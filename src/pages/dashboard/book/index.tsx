@@ -35,6 +35,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { format, addDays, differenceInDays, differenceInHours } from 'date-fns';
+import { z } from 'zod';
+
+// Validation schemas
+const SERVICE_TYPES = ['nanny', 'housekeeper', 'cleaner', 'driver', 'caregiver', 'tutor'] as const;
+const BOOKING_TYPES = ['hourly', 'daily', 'monthly'] as const;
+const TIME_PATTERN = /^\d{2}:\d{2}$/;
+
+const bookingSchema = z.object({
+  service_type: z.enum(SERVICE_TYPES, { 
+    errorMap: () => ({ message: 'Please select a valid service type' }) 
+  }),
+  booking_type: z.enum(BOOKING_TYPES, { 
+    errorMap: () => ({ message: 'Please select a valid booking type' }) 
+  }),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  start_time: z.string().regex(TIME_PATTERN, 'Invalid time format'),
+  end_time: z.string().regex(TIME_PATTERN, 'Invalid time format'),
+  location: z.string()
+    .min(10, 'Location must be at least 10 characters')
+    .max(500, 'Location must be less than 500 characters')
+    .trim(),
+  notes: z.string().max(2000, 'Notes must be less than 2000 characters').optional(),
+  amount: z.number().int().positive('Amount must be positive').max(10000000, 'Amount exceeds maximum'),
+  platform_fee: z.number().int().nonnegative().max(1000000, 'Platform fee exceeds maximum'),
+});
 
 type BookingType = 'hourly' | 'daily' | 'monthly';
 type PaymentMethod = 'card' | 'bank_transfer' | 'wallet';
@@ -136,19 +162,36 @@ export default function BookWorker() {
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from('bookings').insert({
-        client_id: user.id,
-        worker_id: worker.id,
-        service_type: selectedService as "nanny" | "housekeeper" | "cleaner" | "driver" | "caregiver" | "tutor",
+      // Prepare booking data for validation
+      const bookingData = {
+        service_type: selectedService,
         booking_type: bookingType,
         start_date: format(startDate, 'yyyy-MM-dd'),
         end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
         start_time: startTime,
         end_time: endTime,
-        location: location,
-        notes: notes,
+        location: location.trim(),
+        notes: notes?.trim() || undefined,
         amount: calculateAmount(),
         platform_fee: platformFee,
+      };
+
+      // Validate with zod schema
+      const validatedData = bookingSchema.parse(bookingData);
+
+      const { error } = await supabase.from('bookings').insert({
+        client_id: user.id,
+        worker_id: worker.id,
+        service_type: validatedData.service_type,
+        booking_type: validatedData.booking_type,
+        start_date: validatedData.start_date,
+        end_date: validatedData.end_date,
+        start_time: validatedData.start_time,
+        end_time: validatedData.end_time,
+        location: validatedData.location,
+        notes: validatedData.notes || null,
+        amount: validatedData.amount,
+        platform_fee: validatedData.platform_fee,
         status: 'pending' as const,
         payment_status: 'pending'
       });
@@ -158,7 +201,12 @@ export default function BookWorker() {
       toast.success('Booking request sent successfully!');
       navigate('/dashboard/bookings');
     } catch (error: any) {
-      console.error('Error creating booking:', error);
+      // Handle zod validation errors
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError?.message || 'Validation failed');
+        return;
+      }
       toast.error(error.message || 'Failed to create booking');
     } finally {
       setSubmitting(false);
