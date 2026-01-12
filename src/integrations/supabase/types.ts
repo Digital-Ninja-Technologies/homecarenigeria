@@ -125,6 +125,13 @@ export type Database = {
             foreignKeyName: "bookings_worker_id_fkey"
             columns: ["worker_id"]
             isOneToOne: false
+            referencedRelation: "public_workers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
             referencedRelation: "workers"
             referencedColumns: ["id"]
           },
@@ -230,6 +237,13 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: true
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "public_workers"
             referencedColumns: ["id"]
           },
           {
@@ -481,6 +495,48 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      public_workers: {
+        Row: {
+          agency_id: string | null
+          avatar_url: string | null
+          bio: string | null
+          daily_rate: number | null
+          experience_years: number | null
+          full_name: string | null
+          hourly_rate: number | null
+          id: string | null
+          is_featured: boolean | null
+          languages: string[] | null
+          location: string | null
+          monthly_rate: number | null
+          nimc_verified: boolean | null
+          police_verified: boolean | null
+          rating: number | null
+          services: Database["public"]["Enums"]["service_category"][] | null
+          total_jobs: number | null
+          user_id: string | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          working_areas: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workers_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workers_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "public_agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
