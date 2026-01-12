@@ -173,35 +173,25 @@ const FeaturedWorkersSection = () => {
 
   const fetchFeaturedWorkers = async () => {
     try {
-      // Fetch workers
+      // Fetch workers from public_workers view (includes profile data)
       const { data: workersData, error } = await supabase
-        .from('workers')
-        .select('id, services, hourly_rate, experience_years, rating, total_jobs, verification_status, agency_id, working_areas, user_id')
-        .eq('verification_status', 'verified')
+        .from('public_workers')
+        .select('id, services, hourly_rate, experience_years, rating, total_jobs, verification_status, agency_id, working_areas, full_name, avatar_url, location')
         .order('rating', { ascending: false })
         .limit(4);
 
       if (error) throw error;
 
       if (workersData && workersData.length > 0) {
-        // Fetch profiles for these workers
-        const userIds = workersData.map(w => w.user_id);
-        const { data: profilesData } = await supabase
-          .from('public_profiles')
-          .select('user_id, full_name, avatar_url, location')
-          .in('user_id', userIds);
-
-        const profilesMap = new Map(profilesData?.map(p => [p.user_id, p]) || []);
 
         const formattedWorkers: WorkerData[] = workersData.map((worker, index) => {
-          const profile = profilesMap.get(worker.user_id);
           return {
             id: worker.id,
-            name: profile?.full_name || 'Worker',
-            photo: profile?.avatar_url || fallbackImages[index % fallbackImages.length],
+            name: worker.full_name || 'Worker',
+            photo: worker.avatar_url || fallbackImages[index % fallbackImages.length],
             role: worker.services?.[0] ? `${worker.services[0].charAt(0).toUpperCase()}${worker.services[0].slice(1)}` : 'Domestic Worker',
             experience: `${worker.experience_years || 0} years exp`,
-            location: worker.working_areas?.[0] || profile?.location || 'Lagos',
+            location: worker.working_areas?.[0] || worker.location || 'Lagos',
             rating: worker.rating || 0,
             reviews: worker.total_jobs || 0,
             hourlyRate: worker.hourly_rate || 2000,
