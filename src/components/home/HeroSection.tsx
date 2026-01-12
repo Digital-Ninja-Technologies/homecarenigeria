@@ -2,16 +2,33 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, Shield, Star, Users, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import heroFamily from "@/assets/hero-family.jpg";
+
 const services = ["Nanny", "Housekeeper", "Cleaner", "Driver", "Caregiver", "Home Tutor"];
 const locations = ["Lekki", "Victoria Island", "Ikoyi", "Ikeja", "Surulere", "Yaba", "Ajah"];
+
 const HeroSection = () => {
   const [selectedService, setSelectedService] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
-  return <section className="relative overflow-hidden hero-gradient py-16 md:py-24 lg:py-32">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
+  
+  return (
+    <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src={heroFamily}
+          alt="Happy Nigerian family with their trusted caregiver"
+          className="w-full h-full object-cover"
+        />
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-primary/40" />
+      </div>
+
+      {/* Decorative elements */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl" />
       </div>
@@ -125,6 +142,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
 export default HeroSection;
