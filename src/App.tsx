@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import OurProcess from "@/pages/OurProcess";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/services" element={<Services />} />
             <Route path="/services/:category" element={<Services />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/our-process" element={<OurProcess />} />
             <Route path="/for-workers" element={<ForWorkers />} />
             <Route path="/for-agencies" element={<ForAgencies />} />
             <Route path="/workers/:id" element={<WorkerDetail />} />
