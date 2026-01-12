@@ -52,7 +52,7 @@ export default function ClientBookings() {
         );
       }
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      // Silently handle fetch errors - user will see empty state
     } finally {
       setLoading(false);
     }

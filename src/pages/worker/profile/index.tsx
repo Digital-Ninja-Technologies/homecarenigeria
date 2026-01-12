@@ -13,8 +13,36 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
+import { z } from 'zod';
 
 type ServiceCategory = Database["public"]["Enums"]["service_category"];
+
+// Validation schema for worker profile
+const SERVICE_CATEGORIES = ['nanny', 'housekeeper', 'cleaner', 'driver', 'caregiver', 'tutor'] as const;
+
+const workerProfileSchema = z.object({
+  bio: z.string()
+    .max(2000, 'Bio must be less than 2000 characters')
+    .optional()
+    .transform(val => val?.trim() || ''),
+  hourly_rate: z.number()
+    .int('Rate must be a whole number')
+    .min(500, 'Minimum hourly rate is ₦500')
+    .max(100000, 'Maximum hourly rate is ₦100,000')
+    .nullable(),
+  daily_rate: z.number()
+    .int('Rate must be a whole number')
+    .min(2000, 'Minimum daily rate is ₦2,000')
+    .max(500000, 'Maximum daily rate is ₦500,000')
+    .nullable(),
+  monthly_rate: z.number()
+    .int('Rate must be a whole number')
+    .min(30000, 'Minimum monthly rate is ₦30,000')
+    .max(5000000, 'Maximum monthly rate is ₦5,000,000')
+    .nullable(),
+  services: z.array(z.enum(SERVICE_CATEGORIES))
+    .min(1, 'Please select at least one service'),
+});
 
 const serviceTypes: { id: ServiceCategory; label: string }[] = [
   { id: "nanny", label: "Nanny / Childcare" },
@@ -63,7 +91,7 @@ export default function WorkerProfile() {
         });
       }
     } catch (error) {
-      console.error('Error fetching worker:', error);
+      // Silently handle fetch errors - user will see empty state
     } finally {
       setLoading(false);
     }
@@ -81,20 +109,38 @@ export default function WorkerProfile() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Prepare and validate data
+      const profileData = {
+        bio: formData.bio,
+        hourly_rate: formData.hourlyRate ? parseInt(formData.hourlyRate) : null,
+        daily_rate: formData.dailyRate ? parseInt(formData.dailyRate) : null,
+        monthly_rate: formData.monthlyRate ? parseInt(formData.monthlyRate) : null,
+        services: formData.services,
+      };
+
+      // Validate with zod schema
+      const validatedData = workerProfileSchema.parse(profileData);
+
       const { error } = await supabase
         .from('workers')
         .update({
-          bio: formData.bio,
-          hourly_rate: formData.hourlyRate ? parseInt(formData.hourlyRate) : null,
-          daily_rate: formData.dailyRate ? parseInt(formData.dailyRate) : null,
-          monthly_rate: formData.monthlyRate ? parseInt(formData.monthlyRate) : null,
-          services: formData.services,
+          bio: validatedData.bio,
+          hourly_rate: validatedData.hourly_rate,
+          daily_rate: validatedData.daily_rate,
+          monthly_rate: validatedData.monthly_rate,
+          services: validatedData.services,
         })
         .eq('user_id', user?.id);
 
       if (error) throw error;
       toast.success('Profile updated successfully');
-    } catch (error) {
+    } catch (error: any) {
+      // Handle zod validation errors
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError?.message || 'Validation failed');
+        return;
+      }
       toast.error('Failed to update profile');
     } finally {
       setSaving(false);

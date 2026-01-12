@@ -31,7 +31,7 @@ export default function ReviewsPage({ userType = 'client' }: ReviewsPageProps) {
 
       setReviews(data || []);
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      // Silently handle fetch errors - user will see empty state
     } finally {
       setLoading(false);
     }
