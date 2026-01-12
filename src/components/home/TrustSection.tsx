@@ -78,12 +78,6 @@ const TrustSection = () => {
                 );
               })}
             </div>
-
-            <Button size="lg" className="mt-8" asChild>
-              <Link to="/trust-safety">
-                Learn More About Our Process
-              </Link>
-            </Button>
           </div>
 
           {/* Right Visual */}
