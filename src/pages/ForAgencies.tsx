@@ -18,6 +18,7 @@ import {
 import heroAgencies from "@/assets/hero-agencies.jpg";
 import ctaAgencies from "@/assets/cta-agencies.jpg";
 import { useParallax } from "@/hooks/useParallax";
+import AgencyTestimonialsCarousel from "@/components/agencies/AgencyTestimonialsCarousel";
 
 const benefits = [
   {
@@ -237,6 +238,9 @@ const ForAgencies = () => {
             </div>
           </div>
         </section>
+
+        {/* Agency Testimonials */}
+        <AgencyTestimonialsCarousel />
 
         {/* How It Works */}
         <section className="py-16 md:py-24 bg-background">
