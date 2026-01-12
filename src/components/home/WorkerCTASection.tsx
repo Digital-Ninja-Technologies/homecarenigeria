@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Wallet, Calendar, Shield, TrendingUp } from "lucide-react";
-import { useParallax } from "@/hooks/useParallax";
 import ctaHome from "@/assets/cta-home.jpg";
 
 const benefits = [
@@ -12,19 +11,13 @@ const benefits = [
 ];
 
 const WorkerCTASection = () => {
-  const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
-
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
-      {/* Background Image with Parallax */}
-      <div className="absolute inset-0" ref={parallaxRef}>
-        <img
-          src={ctaHome}
-          alt="Team of domestic workers"
-          className="w-full h-full object-cover scale-110 transition-transform duration-100"
-          style={parallaxStyle}
-        />
-      </div>
+      {/* Fixed Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-fixed"
+        style={{ backgroundImage: `url(${ctaHome})` }}
+      />
       <div className="absolute inset-0 hero-gradient opacity-95" />
 
       <div className="container relative">

@@ -69,7 +69,6 @@ const features = [
 
 const HowItWorks = () => {
   const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
-  const [ctaParallaxRef, ctaParallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -162,15 +161,11 @@ const HowItWorks = () => {
 
         {/* CTA Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
-          {/* Background Image with Parallax */}
-          <div className="absolute inset-0" ref={ctaParallaxRef}>
-            <img
-              src={ctaHowItWorks}
-              alt="Family welcoming helper"
-              className="w-full h-full object-cover scale-110 transition-transform duration-100"
-              style={ctaParallaxStyle}
-            />
-          </div>
+          {/* Fixed Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed"
+            style={{ backgroundImage: `url(${ctaHowItWorks})` }}
+          />
           <div className="absolute inset-0 bg-primary/90" />
           <div className="container relative text-center">
             <h2 className="text-2xl md:text-4xl font-bold text-primary-foreground mb-4">
