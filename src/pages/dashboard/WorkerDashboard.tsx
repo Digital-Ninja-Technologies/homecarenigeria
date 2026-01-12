@@ -105,8 +105,8 @@ export default function WorkerDashboard() {
       if (walletData) {
         setWallet(walletData);
       }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+    } catch {
+      // Error fetching dashboard data - silently fail and show empty state
     } finally {
       setLoading(false);
     }
