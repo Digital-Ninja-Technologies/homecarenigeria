@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -6,6 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Quote } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
 
 import agencyLogoElite from "@/assets/agency-logo-elite.jpg";
 import agencyLogoLagos from "@/assets/agency-logo-lagos.jpg";
@@ -44,6 +46,10 @@ const testimonials = [
 ];
 
 const AgencyTestimonialsCarousel = () => {
+  const plugin = useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+  );
+
   return (
     <section className="py-16 md:py-24 bg-secondary/30">
       <div className="container">
@@ -61,6 +67,7 @@ const AgencyTestimonialsCarousel = () => {
             align: "start",
             loop: true,
           }}
+          plugins={[plugin.current]}
           className="w-full max-w-5xl mx-auto"
         >
           <CarouselContent className="-ml-4">
