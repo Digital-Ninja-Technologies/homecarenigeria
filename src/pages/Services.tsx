@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal, X, MapPin, Star, Clock, Building2, User } from "lucide-react";
 import heroServices from "@/assets/hero-services.jpg";
+import { useParallax } from "@/hooks/useParallax";
 
 const allWorkers = [
   {
@@ -127,22 +128,25 @@ const Services = () => {
     return matchesSearch && matchesCategory && matchesLocation && matchesType && matchesRating;
   });
 
+  const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       <main className="flex-1">
         {/* Hero Header with Background Image */}
-        <div className="relative py-12 md:py-20">
-          {/* Background Image */}
-          <div className="absolute inset-0">
+        <div className="relative py-12 md:py-20 overflow-hidden">
+          {/* Background Image with Parallax */}
+          <div className="absolute inset-0" ref={parallaxRef}>
             <img
               src={heroServices}
               alt="Verified domestic workers team"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover scale-110 transition-transform duration-100"
+              style={parallaxStyle}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/90 to-primary/80" />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/90 to-primary/80" />
           
           <div className="container relative">
             <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">
