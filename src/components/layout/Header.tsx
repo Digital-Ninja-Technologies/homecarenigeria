@@ -44,10 +44,11 @@ const Header = () => {
               key={link.to}
               to={link.to}
               className={cn(
-                "text-sm font-medium transition-colors relative",
+                "text-sm font-medium transition-all duration-300 relative py-1",
+                "after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300",
                 isActive(link.to)
-                  ? "text-primary after:absolute after:bottom-[-22px] after:left-0 after:right-0 after:h-0.5 after:bg-primary"
-                  : "text-muted-foreground hover:text-primary"
+                  ? "text-primary after:w-full"
+                  : "text-muted-foreground hover:text-primary after:w-0 hover:after:w-full"
               )}
             >
               {link.label}
