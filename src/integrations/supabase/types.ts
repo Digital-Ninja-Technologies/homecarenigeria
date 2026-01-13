@@ -591,6 +591,15 @@ export type Database = {
       }
     }
     Functions: {
+      create_booking_notification: {
+        Args: {
+          _message: string
+          _target_user_id: string
+          _title: string
+          _type?: string
+        }
+        Returns: string
+      }
       credit_worker_wallet: {
         Args: { _amount: number; _booking_id: string }
         Returns: boolean

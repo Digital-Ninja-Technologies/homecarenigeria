@@ -15,15 +15,22 @@ export async function createNotification({
   message,
   type = 'booking',
 }: CreateNotificationParams): Promise<boolean> {
-  const { error } = await supabase.from('notifications').insert({
-    user_id: userId,
-    title,
-    message,
-    type,
-    is_read: false,
+  // Use the secure RPC function that validates business relationships
+  // This prevents notification spam by only allowing notifications between
+  // users who share a booking (client-worker pairs)
+  const { error } = await supabase.rpc('create_booking_notification', {
+    _target_user_id: userId,
+    _title: title,
+    _message: message,
+    _type: type,
   });
 
-  return !error;
+  if (error) {
+    console.error('Failed to create notification:', error.message);
+    return false;
+  }
+  
+  return true;
 }
 
 export function getBookingStatusMessage(
