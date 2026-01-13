@@ -240,6 +240,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "worker_bookings_view"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reviews_worker_id_fkey"
             columns: ["worker_id"]
             isOneToOne: false
@@ -292,6 +299,13 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "worker_bookings_view"
             referencedColumns: ["id"]
           },
         ]
@@ -538,11 +552,55 @@ export type Database = {
           },
         ]
       }
+      worker_bookings_view: {
+        Row: {
+          amount: number | null
+          booking_type: string | null
+          client_id: string | null
+          created_at: string | null
+          end_date: string | null
+          end_time: string | null
+          id: string | null
+          location: string | null
+          notes: string | null
+          payment_status: string | null
+          platform_fee: number | null
+          service_type: Database["public"]["Enums"]["service_category"] | null
+          start_date: string | null
+          start_time: string | null
+          status: Database["public"]["Enums"]["booking_status"] | null
+          updated_at: string | null
+          worker_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "public_workers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       credit_worker_wallet: {
         Args: { _amount: number; _booking_id: string }
         Returns: boolean
+      }
+      get_booking_location_for_worker: {
+        Args: {
+          _booking_status: Database["public"]["Enums"]["booking_status"]
+          _full_location: string
+        }
+        Returns: string
       }
       get_user_role: {
         Args: { _user_id: string }

@@ -31,14 +31,36 @@ export default function WorkerBookings() {
       if (workerData) {
         setWorker(workerData);
 
+        // Use secure view that masks location for pending bookings
+        // This view automatically filters to the current worker and masks
+        // customer addresses until the booking is accepted
         const { data: bookingsData } = await supabase
-          .from('bookings')
+          .from('worker_bookings_view' as any)
           .select('*')
-          .eq('worker_id', workerData.id)
           .order('created_at', { ascending: false });
 
-        if (bookingsData) {
-          const clientIds = [...new Set(bookingsData.map(b => b.client_id))];
+        if (bookingsData && Array.isArray(bookingsData)) {
+          const typedBookings = bookingsData as unknown as Array<{
+            id: string;
+            client_id: string;
+            worker_id: string;
+            service_type: string;
+            booking_type: string;
+            start_date: string;
+            end_date: string | null;
+            start_time: string | null;
+            end_time: string | null;
+            status: string;
+            amount: number;
+            platform_fee: number | null;
+            payment_status: string | null;
+            notes: string | null;
+            location: string;
+            created_at: string;
+            updated_at: string;
+          }>;
+          
+          const clientIds = [...new Set(typedBookings.map(b => b.client_id))];
           const { data: profiles } = await supabase
             .from('profiles')
             .select('user_id, full_name')
@@ -50,7 +72,7 @@ export default function WorkerBookings() {
           });
 
           setBookings(
-            bookingsData.map(b => ({
+            typedBookings.map(b => ({
               ...b,
               client_name: clientNameMap.get(b.client_id) || 'Unknown',
             }))
