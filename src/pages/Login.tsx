@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Mail, Lock, Phone, ArrowRight } from "lucide-react";
+import { Shield, Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import authBackground from "@/assets/auth-background.jpg";
@@ -12,12 +12,8 @@ const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get('redirect');
-  const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [showOTP, setShowOTP] = useState(false);
-  const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,85 +21,35 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      if (loginMethod === "email") {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password: password,
-        });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
 
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
 
-        if (data.user) {
-          // Fetch user role to redirect appropriately
-          const { data: roleData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', data.user.id)
-            .single();
+      if (data.user) {
+        // Fetch user role to redirect appropriately
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .single();
 
-          toast.success("Login successful!");
-          
-          // Handle redirect URL if present
-          if (redirectUrl) {
-            navigate(redirectUrl);
-          } else if (roleData?.role === 'worker') {
-            navigate('/worker/dashboard');
-          } else if (roleData?.role === 'agency') {
-            navigate('/agency/dashboard');
-          } else {
-            navigate('/dashboard');
-          }
-        }
-      } else if (loginMethod === "phone") {
-        if (!showOTP) {
-          // Send OTP
-          const { error } = await supabase.auth.signInWithOtp({
-            phone: `+234${phone.replace(/\s/g, '')}`,
-          });
-
-          if (error) {
-            toast.error(error.message);
-            return;
-          }
-
-          setShowOTP(true);
-          toast.success("OTP sent to your phone!");
+        toast.success("Login successful!");
+        
+        // Handle redirect URL if present
+        if (redirectUrl) {
+          navigate(redirectUrl);
+        } else if (roleData?.role === 'worker') {
+          navigate('/worker/dashboard');
+        } else if (roleData?.role === 'agency') {
+          navigate('/agency/dashboard');
         } else {
-          // Verify OTP
-          const { data, error } = await supabase.auth.verifyOtp({
-            phone: `+234${phone.replace(/\s/g, '')}`,
-            token: otp,
-            type: 'sms',
-          });
-
-          if (error) {
-            toast.error(error.message);
-            return;
-          }
-
-          if (data.user) {
-            const { data: roleData } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', data.user.id)
-              .single();
-
-            toast.success("Login successful!");
-            
-            // Handle redirect URL if present
-            if (redirectUrl) {
-              navigate(redirectUrl);
-            } else if (roleData?.role === 'worker') {
-              navigate('/worker/dashboard');
-            } else if (roleData?.role === 'agency') {
-              navigate('/agency/dashboard');
-            } else {
-              navigate('/dashboard');
-            }
-          }
+          navigate('/dashboard');
         }
       }
     } catch (error) {
@@ -136,122 +82,45 @@ const Login = () => {
             Sign in to your account to continue
           </p>
 
-          {/* Login Method Toggle */}
-          <div className="flex gap-2 p-1 bg-secondary rounded-lg mb-6">
-            <button
-              type="button"
-              onClick={() => {
-                setLoginMethod("email");
-                setShowOTP(false);
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${
-                loginMethod === "email"
-                  ? "bg-white text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Mail className="h-4 w-4" />
-              Email
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginMethod("phone")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${
-                loginMethod === "phone"
-                  ? "bg-white text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Phone className="h-4 w-4" />
-              Phone
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
-            {loginMethod === "email" ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-              </>
-            ) : showOTP ? (
-              <div className="space-y-2">
-                <Label htmlFor="otp">Enter OTP</Label>
-                <p className="text-sm text-muted-foreground mb-4">
-                  We sent a 6-digit code to +234 {phone}
-                </p>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="otp"
-                  type="text"
-                  placeholder="Enter 6-digit OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  maxLength={6}
-                  className="text-center text-lg tracking-widest"
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowOTP(false)}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Change phone number
-                </button>
               </div>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone number</Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    +234
-                  </span>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="801 234 5678"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="pl-14"
-                    required
-                  />
-                </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </Link>
               </div>
-            )}
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
 
             <Button type="submit" size="lg" className="w-full gap-2" disabled={isLoading}>
-              {isLoading ? "Please wait..." : loginMethod === "phone" && !showOTP ? "Send OTP" : "Sign In"}
+              {isLoading ? "Please wait..." : "Sign In"}
               {!isLoading && <ArrowRight className="h-4 w-4" />}
             </Button>
           </form>
