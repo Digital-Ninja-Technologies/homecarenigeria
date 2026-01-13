@@ -9,6 +9,8 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import SignupClient from "./pages/SignupClient";
 import SignupWorker from "./pages/SignupWorker";
 import SignupAgency from "./pages/SignupAgency";
@@ -54,6 +56,8 @@ const App = () => (
             <Route path="/workers/:id" element={<WorkerDetail />} />
             <Route path="/book/:id" element={<PublicBooking />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/signup/client" element={<SignupClient />} />
             <Route path="/signup/worker" element={<SignupWorker />} />
             <Route path="/signup/agency" element={<SignupAgency />} />
