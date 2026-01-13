@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import authBackground from "@/assets/auth-background.jpg";
 import { Separator } from "@/components/ui/separator";
+import { EmailVerificationBanner } from "@/components/auth/EmailVerificationBanner";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showVerificationBanner, setShowVerificationBanner] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
@@ -49,9 +52,19 @@ const Login = () => {
       });
 
       if (error) {
-        toast.error(error.message);
+        // Check if the error is due to unverified email
+        if (error.message.includes("Email not confirmed")) {
+          setUnverifiedEmail(email.trim());
+          setShowVerificationBanner(true);
+          toast.error("Please verify your email before signing in");
+        } else {
+          toast.error(error.message);
+        }
         return;
       }
+
+      // Reset verification banner on successful login
+      setShowVerificationBanner(false);
 
       if (data.user) {
         // Fetch user role to redirect appropriately
@@ -103,6 +116,13 @@ const Login = () => {
           <p className="text-muted-foreground mb-8">
             Sign in to your account to continue
           </p>
+
+          {showVerificationBanner && (
+            <EmailVerificationBanner 
+              email={unverifiedEmail} 
+              onDismiss={() => setShowVerificationBanner(false)}
+            />
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
