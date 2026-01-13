@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, User, Star, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Star, CheckCircle, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BookingCardProps {
@@ -18,6 +18,7 @@ interface BookingCardProps {
     worker_name?: string;
     client_name?: string;
     has_review?: boolean;
+    payment_status?: string;
   };
   userType: 'client' | 'worker' | 'agency';
   onAction?: (action: string, bookingId: string) => void;
@@ -45,6 +46,8 @@ export const BookingCard = ({ booking, userType, onAction }: BookingCardProps) =
   const showWorkerCompleteAction = userType === 'worker' && ['accepted', 'in_progress'].includes(booking.status);
   const showClientActions = userType === 'client' && booking.status === 'pending';
   const showReviewButton = userType === 'client' && booking.status === 'completed' && !booking.has_review;
+  const showReleasePayment = userType === 'client' && booking.status === 'completed' && booking.payment_status !== 'released';
+  const paymentReleased = booking.payment_status === 'released';
 
   return (
     <Card>
@@ -120,6 +123,24 @@ export const BookingCard = ({ booking, userType, onAction }: BookingCardProps) =
               >
                 Cancel
               </Button>
+            )}
+
+            {showReleasePayment && (
+              <Button
+                size="sm"
+                onClick={() => onAction?.('release_payment', booking.id)}
+                className="bg-accent hover:bg-accent/90"
+              >
+                <Wallet className="w-4 h-4 mr-1" />
+                Release Payment
+              </Button>
+            )}
+
+            {paymentReleased && (
+              <Badge className="bg-emerald-100 text-emerald-800">
+                <Wallet className="w-3 h-3 mr-1" />
+                Payment Released
+              </Badge>
             )}
 
             {showReviewButton && (

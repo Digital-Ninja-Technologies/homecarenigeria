@@ -80,10 +80,10 @@ export default function ClientBookings() {
   };
 
   const handleAction = async (action: string, bookingId: string) => {
-    if (action === 'cancel') {
-      const booking = bookings.find(b => b.id === bookingId);
-      if (!booking) return;
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) return;
 
+    if (action === 'cancel') {
       // Get client's name for notification
       const { data: clientProfile } = await supabase
         .from('profiles')
@@ -113,12 +113,35 @@ export default function ClientBookings() {
       }
     }
 
-    if (action === 'review') {
-      const booking = bookings.find(b => b.id === bookingId);
-      if (booking) {
-        setSelectedBooking(booking);
-        setReviewDialogOpen(true);
+    if (action === 'release_payment') {
+      // Call the secure credit_worker_wallet function to release payment
+      const { data, error } = await supabase.rpc('credit_worker_wallet', {
+        _booking_id: bookingId,
+        _amount: booking.amount,
+      });
+
+      if (!error && data) {
+        // Notify the worker about the payment release
+        if (booking.worker_user_id) {
+          const netAmount = booking.amount - (booking.platform_fee || 0);
+          await createNotification({
+            userId: booking.worker_user_id,
+            title: 'Payment Released! 🎉',
+            message: `You've received ₦${netAmount.toLocaleString()} for your ${booking.service_type} job. Check your wallet!`,
+            type: 'payment',
+          });
+        }
+        toast.success('Payment released to worker successfully!');
+        fetchBookings();
+      } else {
+        console.error('Payment release error:', error);
+        toast.error(error?.message || 'Failed to release payment');
       }
+    }
+
+    if (action === 'review') {
+      setSelectedBooking(booking);
+      setReviewDialogOpen(true);
     }
   };
 
