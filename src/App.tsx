@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import OurProcess from "@/pages/OurProcess";
+import Install from "@/pages/Install";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/our-process" element={<OurProcess />} />
             <Route path="/for-workers" element={<ForWorkers />} />
             <Route path="/for-agencies" element={<ForAgencies />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/workers/:id" element={<WorkerDetail />} />
             <Route path="/book/:id" element={<PublicBooking />} />
             <Route path="/login" element={<Login />} />
