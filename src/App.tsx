@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import OurProcess from "@/pages/OurProcess";
 import Install from "@/pages/Install";
+import InstallBanner from "@/components/InstallBanner";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -46,6 +47,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <InstallBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<Services />} />
