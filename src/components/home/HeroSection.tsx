@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, Shield, Star, Users, ChevronDown } from "lucide-react";
+import { Search, Shield, Star, Users, ChevronDown, Baby, Home, Sparkles, Car, Heart, GraduationCap, MapPin, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroFamily from "@/assets/hero-family.jpg";
 import { useParallax } from "@/hooks/useParallax";
 
-const services = ["Nanny", "Housekeeper", "Cleaner", "Driver", "Caregiver", "Home Tutor"];
+const services = [
+  { name: "Nanny", icon: Baby },
+  { name: "Housekeeper", icon: Home },
+  { name: "Cleaner", icon: Sparkles },
+  { name: "Driver", icon: Car },
+  { name: "Caregiver", icon: Heart },
+  { name: "Home Tutor", icon: GraduationCap },
+];
 const locations = ["Lekki", "Victoria Island", "Ikoyi", "Ikeja", "Surulere", "Yaba", "Ajah"];
 
 const HeroSection = () => {
@@ -14,6 +21,25 @@ const HeroSection = () => {
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
+  
+  const serviceRef = useRef<HTMLDivElement>(null);
+  const locationRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (serviceRef.current && !serviceRef.current.contains(event.target as Node)) {
+        setShowServiceDropdown(false);
+      }
+      if (locationRef.current && !locationRef.current.contains(event.target as Node)) {
+        setShowLocationDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedServiceData = services.find(s => s.name === selectedService);
   
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
@@ -60,58 +86,113 @@ const HeroSection = () => {
             Background-checked, reviewed, and ready to help.
           </p>
 
-          {/* Search Box */}
-          <div className="bg-white rounded-2xl p-2 md:p-3 shadow-2xl max-w-2xl mx-auto animate-fade-in" style={{
+          {/* Modern Search Box */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3 md:p-4 shadow-2xl max-w-2xl mx-auto animate-fade-in border border-white/20" style={{
           animationDelay: "0.3s"
         }}>
-            <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex flex-col md:flex-row gap-3">
               {/* Service Dropdown */}
-              <div className="relative flex-1">
-                <button onClick={() => {
-                setShowServiceDropdown(!showServiceDropdown);
-                setShowLocationDropdown(false);
-              }} className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-secondary text-left text-foreground hover:bg-secondary/80 transition-colors">
-                  <span className={selectedService ? "text-foreground" : "text-muted-foreground"}>
-                    {selectedService || "What do you need?"}
-                  </span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              <div className="relative flex-1" ref={serviceRef}>
+                <button 
+                  onClick={() => {
+                    setShowServiceDropdown(!showServiceDropdown);
+                    setShowLocationDropdown(false);
+                  }} 
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-secondary/80 text-left text-foreground hover:bg-secondary transition-all duration-200 group border border-transparent hover:border-primary/20"
+                >
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
+                    {selectedServiceData ? <selectedServiceData.icon className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Service</span>
+                    <p className={`text-sm font-semibold truncate ${selectedService ? "text-foreground" : "text-muted-foreground"}`}>
+                      {selectedService || "What do you need?"}
+                    </p>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showServiceDropdown ? "rotate-180" : ""}`} />
                 </button>
-                {showServiceDropdown && <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
-                    {services.map(service => <button key={service} onClick={() => {
-                  setSelectedService(service);
-                  setShowServiceDropdown(false);
-                }} className="w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors text-card-foreground">
-                        {service}
-                      </button>)}
-                  </div>}
+                
+                {/* Service Dropdown Menu */}
+                <div className={`absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 origin-top ${showServiceDropdown ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"}`}>
+                  <div className="p-2">
+                    {services.map((service, index) => {
+                      const Icon = service.icon;
+                      const isSelected = selectedService === service.name;
+                      return (
+                        <button 
+                          key={service.name} 
+                          onClick={() => {
+                            setSelectedService(service.name);
+                            setShowServiceDropdown(false);
+                          }} 
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${isSelected ? "bg-primary text-primary-foreground" : "hover:bg-muted text-card-foreground"}`}
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? "bg-primary-foreground/20" : "bg-primary/10"}`}>
+                            <Icon className={`h-4 w-4 ${isSelected ? "text-primary-foreground" : "text-primary"}`} />
+                          </div>
+                          <span className="flex-1 text-sm font-medium">{service.name}</span>
+                          {isSelected && <Check className="h-4 w-4" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {/* Location Dropdown */}
-              <div className="relative flex-1">
-                <button onClick={() => {
-                setShowLocationDropdown(!showLocationDropdown);
-                setShowServiceDropdown(false);
-              }} className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-secondary text-left text-foreground hover:bg-secondary/80 transition-colors">
-                  <span className={selectedLocation ? "text-foreground" : "text-muted-foreground"}>
-                    {selectedLocation || "Location in Lagos"}
-                  </span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              <div className="relative flex-1" ref={locationRef}>
+                <button 
+                  onClick={() => {
+                    setShowLocationDropdown(!showLocationDropdown);
+                    setShowServiceDropdown(false);
+                  }} 
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-secondary/80 text-left text-foreground hover:bg-secondary transition-all duration-200 group border border-transparent hover:border-primary/20"
+                >
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-all duration-200">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Location</span>
+                    <p className={`text-sm font-semibold truncate ${selectedLocation ? "text-foreground" : "text-muted-foreground"}`}>
+                      {selectedLocation || "Where in Lagos?"}
+                    </p>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showLocationDropdown ? "rotate-180" : ""}`} />
                 </button>
-                {showLocationDropdown && <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-xl border border-border z-50 overflow-hidden">
-                    {locations.map(location => <button key={location} onClick={() => {
-                  setSelectedLocation(location);
-                  setShowLocationDropdown(false);
-                }} className="w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors text-card-foreground">
-                        {location}
-                      </button>)}
-                  </div>}
+                
+                {/* Location Dropdown Menu */}
+                <div className={`absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 origin-top ${showLocationDropdown ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"}`}>
+                  <div className="p-2">
+                    {locations.map((location, index) => {
+                      const isSelected = selectedLocation === location;
+                      return (
+                        <button 
+                          key={location} 
+                          onClick={() => {
+                            setSelectedLocation(location);
+                            setShowLocationDropdown(false);
+                          }} 
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-muted text-card-foreground"}`}
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? "bg-accent-foreground/20" : "bg-accent/10"}`}>
+                            <MapPin className={`h-4 w-4 ${isSelected ? "text-accent-foreground" : "text-accent"}`} />
+                          </div>
+                          <span className="flex-1 text-sm font-medium">{location}</span>
+                          {isSelected && <Check className="h-4 w-4" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {/* Search Button */}
-              <Button size="lg" className="gap-2 md:px-8" asChild>
+              <Button size="lg" className="gap-2 md:px-8 h-auto py-3.5 md:py-0 shadow-lg hover:shadow-xl transition-all duration-200" asChild>
                 <Link to="/services">
                   <Search className="h-5 w-5" />
-                  <span>Search</span>
+                  <span className="font-semibold">Search</span>
                 </Link>
               </Button>
             </div>
