@@ -9,7 +9,7 @@ import {
   ArrowRight, 
   ArrowLeft, 
   User, 
-  Phone, 
+  Phone,
   MapPin, 
   Briefcase,
   Upload,

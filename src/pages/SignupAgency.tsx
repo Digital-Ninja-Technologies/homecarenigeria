@@ -9,7 +9,7 @@ import {
   ArrowRight, 
   ArrowLeft, 
   Building2, 
-  Phone, 
+  Phone,
   MapPin, 
   Mail,
   Upload,

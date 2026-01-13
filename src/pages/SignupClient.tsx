@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Mail, Lock, Phone, User, MapPin, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Shield, Mail, Lock, User, MapPin, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import authBackground from "@/assets/auth-background.jpg";
