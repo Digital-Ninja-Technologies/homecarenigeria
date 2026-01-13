@@ -76,11 +76,11 @@ const HeroSection = () => {
                   </span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
-                {showServiceDropdown && <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-border z-10">
+                {showServiceDropdown && <div className="absolute top-full left-0 right-0 mt-2 bg-background rounded-xl shadow-lg border border-border z-50">
                     {services.map(service => <button key={service} onClick={() => {
                   setSelectedService(service);
                   setShowServiceDropdown(false);
-                }} className="w-full px-4 py-3 text-left text-sm hover:bg-secondary transition-colors first:rounded-t-xl last:rounded-b-xl text-secondary-foreground">
+                }} className="w-full px-4 py-3 text-left text-sm hover:bg-secondary transition-colors first:rounded-t-xl last:rounded-b-xl text-foreground">
                         {service}
                       </button>)}
                   </div>}
@@ -97,11 +97,11 @@ const HeroSection = () => {
                   </span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
-                {showLocationDropdown && <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-border z-10">
+                {showLocationDropdown && <div className="absolute top-full left-0 right-0 mt-2 bg-background rounded-xl shadow-lg border border-border z-50">
                     {locations.map(location => <button key={location} onClick={() => {
                   setSelectedLocation(location);
                   setShowLocationDropdown(false);
-                }} className="w-full px-4 py-3 text-left text-sm hover:bg-secondary transition-colors first:rounded-t-xl last:rounded-b-xl text-secondary-foreground">
+                }} className="w-full px-4 py-3 text-left text-sm hover:bg-secondary transition-colors first:rounded-t-xl last:rounded-b-xl text-foreground">
                         {location}
                       </button>)}
                   </div>}
