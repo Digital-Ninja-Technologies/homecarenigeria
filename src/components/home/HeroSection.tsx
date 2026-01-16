@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, Shield, Star, Users, ChevronDown, Baby, Home, Sparkles, Car, Heart, GraduationCap, MapPin, Check } from "lucide-react";
+import { Search, Shield, Star, Users, ChevronDown, Baby, Home, Sparkles, Car, Heart, GraduationCap, MapPin, Check, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroFamily from "@/assets/hero-family.jpg";
 import { useParallax } from "@/hooks/useParallax";
@@ -12,6 +12,7 @@ const services = [
   { name: "Driver", icon: Car },
   { name: "Caregiver", icon: Heart },
   { name: "Home Tutor", icon: GraduationCap },
+  { name: "Errand Runner", icon: ShoppingBag },
 ];
 const locations = ["Lekki", "Victoria Island", "Ikoyi", "Ikeja", "Surulere", "Yaba", "Ajah"];
 

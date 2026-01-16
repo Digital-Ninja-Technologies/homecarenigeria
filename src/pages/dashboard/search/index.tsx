@@ -13,8 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, MapPin, Star, Filter, CheckCircle } from 'lucide-react';
+import { Search, MapPin, Star, CheckCircle, Navigation, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useGeolocation, getDistanceToLocation, formatDistance } from '@/hooks/useGeolocation';
+import { toast } from 'sonner';
 
 const serviceCategories = [
   { id: 'all', label: 'All Services' },
@@ -24,6 +26,7 @@ const serviceCategories = [
   { id: 'driver', label: 'Driver' },
   { id: 'caregiver', label: 'Caregiver' },
   { id: 'tutor', label: 'Tutor' },
+  { id: 'errand', label: 'Errand Runner' },
 ];
 
 const locations = [
@@ -44,10 +47,27 @@ export default function SearchWorkers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
+  const [sortByDistance, setSortByDistance] = useState(false);
+  
+  const { latitude, longitude, loading: geoLoading, error: geoError, requestLocation, sortByProximity } = useGeolocation();
 
   useEffect(() => {
     fetchWorkers();
   }, [selectedCategory, selectedLocation]);
+
+  // Request location on first load if user wants proximity sorting
+  useEffect(() => {
+    if (sortByDistance && latitude === null && !geoLoading) {
+      requestLocation();
+    }
+  }, [sortByDistance]);
+
+  useEffect(() => {
+    if (geoError) {
+      toast.error(geoError);
+      setSortByDistance(false);
+    }
+  }, [geoError]);
 
   const fetchWorkers = async () => {
     try {
@@ -80,11 +100,25 @@ export default function SearchWorkers() {
     }
   };
 
-  const filteredWorkers = workers.filter(worker => {
-    if (!searchQuery) return true;
-    const profile = worker.profiles;
-    return profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  // Apply search filter and proximity sorting
+  const filteredWorkers = (() => {
+    let result = workers.filter(worker => {
+      if (!searchQuery) return true;
+      const profile = worker.profiles;
+      return profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+    
+    // Sort by distance if enabled and we have user location
+    if (sortByDistance && latitude !== null && longitude !== null) {
+      result = sortByProximity(result.map(w => ({
+        ...w,
+        location: w.profiles?.location,
+        working_areas: w.working_areas,
+      })));
+    }
+    
+    return result;
+  })();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
@@ -92,6 +126,17 @@ export default function SearchWorkers() {
       currency: 'NGN',
       minimumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const handleProximityToggle = () => {
+    if (!sortByDistance) {
+      setSortByDistance(true);
+      if (latitude === null) {
+        requestLocation();
+      }
+    } else {
+      setSortByDistance(false);
+    }
   };
 
   return (
@@ -105,40 +150,65 @@ export default function SearchWorkers() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {serviceCategories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Location" />
+              </SelectTrigger>
+              <SelectContent>
+                {locations.map((loc) => (
+                  <SelectItem key={loc} value={loc}>
+                    {loc}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {serviceCategories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Location" />
-            </SelectTrigger>
-            <SelectContent>
-              {locations.map((loc) => (
-                <SelectItem key={loc} value={loc}>
-                  {loc}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          
+          {/* Proximity Sort Button */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant={sortByDistance ? "default" : "outline"}
+              size="sm"
+              onClick={handleProximityToggle}
+              disabled={geoLoading}
+              className="gap-2"
+            >
+              {geoLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Navigation className="h-4 w-4" />
+              )}
+              {sortByDistance ? "Sorted by Distance" : "Sort by Nearest"}
+            </Button>
+            {sortByDistance && latitude !== null && (
+              <span className="text-sm text-muted-foreground">
+                Showing workers closest to your location
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Results */}
@@ -148,57 +218,69 @@ export default function SearchWorkers() {
           </div>
         ) : filteredWorkers.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredWorkers.map((worker) => (
-              <Card key={worker.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <Avatar className="w-14 h-14">
-                      <AvatarImage src={worker.profiles?.avatar_url} />
-                      <AvatarFallback>
-                        {worker.profiles?.full_name?.charAt(0) || 'W'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold truncate">
-                          {worker.profiles?.full_name}
-                        </h3>
-                        <CheckCircle className="w-4 h-4 text-accent shrink-0" />
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <MapPin className="w-3 h-3" />
-                        {worker.working_areas?.[0] || 'Lagos'}
-                      </div>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                        {(worker.rating || 0).toFixed(1)}
-                        <span className="text-muted-foreground">
-                          ({worker.total_jobs || 0} jobs)
-                        </span>
+            {filteredWorkers.map((worker) => {
+              const workerLocation = worker.working_areas?.[0] || 'Lagos';
+              const distance = latitude !== null && longitude !== null 
+                ? getDistanceToLocation(latitude, longitude, workerLocation) 
+                : null;
+              
+              return (
+                <Card key={worker.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-14 h-14">
+                        <AvatarImage src={worker.profiles?.avatar_url} />
+                        <AvatarFallback>
+                          {worker.profiles?.full_name?.charAt(0) || 'W'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold truncate">
+                            {worker.profiles?.full_name}
+                          </h3>
+                          <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                        </div>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <MapPin className="w-3 h-3" />
+                          {workerLocation}
+                          {sortByDistance && distance !== null && (
+                            <span className="text-xs text-accent ml-1">
+                              • {formatDistance(distance)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-sm">
+                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          {(worker.rating || 0).toFixed(1)}
+                          <span className="text-muted-foreground">
+                            ({worker.total_jobs || 0} jobs)
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {worker.services?.slice(0, 3).map((service: string) => (
-                      <Badge key={service} variant="secondary" className="text-xs capitalize">
-                        {service}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between mt-4 pt-3 border-t">
-                    <div>
-                      <p className="text-sm text-muted-foreground">From</p>
-                      <p className="font-semibold">
-                        {formatCurrency(worker.hourly_rate || 2000)}/hr
-                      </p>
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {worker.services?.slice(0, 3).map((service: string) => (
+                        <Badge key={service} variant="secondary" className="text-xs capitalize">
+                          {service === 'errand' ? 'Errand Runner' : service}
+                        </Badge>
+                      ))}
                     </div>
-                    <Button size="sm" asChild>
-                      <Link to={`/dashboard/book/${worker.id}`}>Book Now</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t">
+                      <div>
+                        <p className="text-sm text-muted-foreground">From</p>
+                        <p className="font-semibold">
+                          {formatCurrency(worker.hourly_rate || 2000)}/hr
+                        </p>
+                      </div>
+                      <Button size="sm" asChild>
+                        <Link to={`/dashboard/book/${worker.id}`}>Book Now</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -209,6 +291,7 @@ export default function SearchWorkers() {
               setSelectedCategory('all');
               setSelectedLocation('All Locations');
               setSearchQuery('');
+              setSortByDistance(false);
             }}>
               Clear Filters
             </Button>

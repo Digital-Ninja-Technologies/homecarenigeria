@@ -640,6 +640,7 @@ export type Database = {
         | "driver"
         | "caregiver"
         | "tutor"
+        | "errand"
       verification_status: "pending" | "verified" | "rejected"
     }
     CompositeTypes: {
@@ -784,6 +785,7 @@ export const Constants = {
         "driver",
         "caregiver",
         "tutor",
+        "errand",
       ],
       verification_status: ["pending", "verified", "rejected"],
     },

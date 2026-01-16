@@ -18,7 +18,7 @@ import { z } from 'zod';
 type ServiceCategory = Database["public"]["Enums"]["service_category"];
 
 // Validation schema for worker profile
-const SERVICE_CATEGORIES = ['nanny', 'housekeeper', 'cleaner', 'driver', 'caregiver', 'tutor'] as const;
+const SERVICE_CATEGORIES = ['nanny', 'housekeeper', 'cleaner', 'driver', 'caregiver', 'tutor', 'errand'] as const;
 
 const workerProfileSchema = z.object({
   bio: z.string()
@@ -51,6 +51,7 @@ const serviceTypes: { id: ServiceCategory; label: string }[] = [
   { id: "driver", label: "Driver" },
   { id: "caregiver", label: "Elderly Caregiver" },
   { id: "tutor", label: "Home Tutor" },
+  { id: "errand", label: "Errand / Personal Assistant" },
 ];
 
 export default function WorkerProfile() {

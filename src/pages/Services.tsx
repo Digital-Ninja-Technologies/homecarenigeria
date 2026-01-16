@@ -93,6 +93,20 @@ const allWorkers = [
     skills: ["Mathematics", "English", "Science", "Primary Education"],
     category: "tutor",
   },
+  {
+    id: "7",
+    name: "Tunde Bakare",
+    role: "Errand Runner",
+    experience: "4 years exp",
+    location: "Lekki",
+    rating: 4.8,
+    reviews: 35,
+    hourlyRate: 1500,
+    isVerified: true,
+    isAgency: false,
+    skills: ["Shopping", "Deliveries", "Bill Payments", "Bank Runs"],
+    category: "errand",
+  },
 ];
 
 const categories = [
@@ -103,6 +117,7 @@ const categories = [
   { id: "driver", label: "Drivers" },
   { id: "caregiver", label: "Caregivers" },
   { id: "tutor", label: "Tutors" },
+  { id: "errand", label: "Errand Runners" },
 ];
 
 const locations = ["All Areas", "Lekki", "Victoria Island", "Ikoyi", "Ikeja", "Surulere", "Yaba", "Ajah"];
