@@ -6,6 +6,7 @@ import serviceCleaner from "@/assets/service-cleaner.jpg";
 import serviceDriver from "@/assets/service-driver.jpg";
 import serviceCaregiver from "@/assets/service-caregiver.jpg";
 import serviceTutor from "@/assets/service-tutor.jpg";
+import serviceErrand from "@/assets/service-errand.jpg";
 
 const services = [
   {
@@ -49,6 +50,13 @@ const services = [
     description: "Qualified educators for personalized home learning",
     image: serviceTutor,
     color: "from-amber-500/80 to-amber-600/80",
+  },
+  {
+    id: "errand",
+    title: "Errand Runners",
+    description: "Personal assistants for shopping, deliveries, and daily tasks",
+    image: serviceErrand,
+    color: "from-teal-500/80 to-teal-600/80",
   },
 ];
 
