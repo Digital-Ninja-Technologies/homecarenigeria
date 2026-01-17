@@ -353,6 +353,7 @@ const SignupWorker = () => {
                       >
                         <Checkbox 
                           checked={formData.services.includes(service.id)}
+                          onClick={(e) => e.stopPropagation()}
                           onCheckedChange={() => toggleService(service.id)}
                         />
                         <span className="text-sm font-medium">{service.label}</span>
