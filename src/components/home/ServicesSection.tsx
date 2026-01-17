@@ -7,7 +7,8 @@ import serviceDriver from "@/assets/service-driver.jpg";
 import serviceCaregiver from "@/assets/service-caregiver.jpg";
 import serviceTutor from "@/assets/service-tutor.jpg";
 import serviceErrand from "@/assets/service-errand.jpg";
-
+import advertAgencies from "@/assets/advert-agencies.jpg";
+import advertWorkers from "@/assets/advert-workers.jpg";
 const services = [
   {
     id: "nanny",
@@ -94,22 +95,33 @@ const ServiceCard = ({ service, index }: { service: typeof services[0]; index: n
 );
 
 const AdvertCard = ({ variant }: { variant: "left" | "right" }) => (
-  <div className="relative rounded-2xl overflow-hidden shadow-card animate-fade-in aspect-[4/3] bg-gradient-to-br from-primary via-primary/90 to-primary-foreground/20">
+  <div className="group relative rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-in aspect-[4/3]">
+    {/* Background Image */}
+    <img
+      src={variant === "left" ? advertAgencies : advertWorkers}
+      alt={variant === "left" ? "Partner with us" : "Start earning"}
+      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+    />
+    
+    {/* Gradient Overlay */}
+    <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40 group-hover:from-primary/90 group-hover:via-primary/60 transition-all duration-300" />
+    
+    {/* Content */}
     <div className="absolute inset-0 p-6 flex flex-col justify-between text-white">
       {variant === "left" ? (
         <>
           <div>
-            <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-xs font-medium mb-3">
+            <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-medium mb-3">
               For Agencies
             </span>
             <h3 className="text-xl font-bold mb-2">Partner With Us</h3>
-            <p className="text-sm text-white/80">
+            <p className="text-sm text-white/90">
               List your workers on our platform and reach thousands of clients in Lagos.
             </p>
           </div>
           <Link
             to="/for-agencies"
-            className="inline-flex items-center text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
+            className="inline-flex items-center text-sm font-semibold text-accent hover:text-white transition-colors group-hover:translate-x-1 duration-300"
           >
             Learn More <ArrowRight className="h-4 w-4 ml-1" />
           </Link>
@@ -117,17 +129,17 @@ const AdvertCard = ({ variant }: { variant: "left" | "right" }) => (
       ) : (
         <>
           <div>
-            <span className="inline-block px-3 py-1 rounded-full bg-accent/30 text-xs font-medium mb-3">
+            <span className="inline-block px-3 py-1 rounded-full bg-accent/40 backdrop-blur-sm text-xs font-medium mb-3">
               For Workers
             </span>
             <h3 className="text-xl font-bold mb-2">Start Earning Today</h3>
-            <p className="text-sm text-white/80">
+            <p className="text-sm text-white/90">
               Join our network of verified professionals and connect with families.
             </p>
           </div>
           <Link
             to="/for-workers"
-            className="inline-flex items-center text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
+            className="inline-flex items-center text-sm font-semibold text-accent hover:text-white transition-colors group-hover:translate-x-1 duration-300"
           >
             Sign Up Now <ArrowRight className="h-4 w-4 ml-1" />
           </Link>
