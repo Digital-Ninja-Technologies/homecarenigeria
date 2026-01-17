@@ -60,7 +60,89 @@ const services = [
   },
 ];
 
+const ServiceCard = ({ service, index }: { service: typeof services[0]; index: number }) => (
+  <Link
+    to={`/services/${service.id}`}
+    className="group relative rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-in aspect-[4/3]"
+    style={{ animationDelay: `${index * 0.1}s` }}
+  >
+    {/* Background Image */}
+    <img
+      src={service.image}
+      alt={service.title}
+      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+    />
+    
+    {/* Gradient Overlay */}
+    <div className={`absolute inset-0 bg-gradient-to-t ${service.color} opacity-60 group-hover:opacity-70 transition-opacity`} />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+    
+    {/* Content */}
+    <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+      <h3 className="text-xl font-bold mb-2 group-hover:translate-y-0 transition-transform">
+        {service.title}
+      </h3>
+      <p className="text-sm text-white/90 mb-3 line-clamp-2">
+        {service.description}
+      </p>
+      <div className="flex items-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span>Browse Workers</span>
+        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+      </div>
+    </div>
+  </Link>
+);
+
+const AdvertCard = ({ variant }: { variant: "left" | "right" }) => (
+  <div className="relative rounded-2xl overflow-hidden shadow-card animate-fade-in aspect-[4/3] bg-gradient-to-br from-primary via-primary/90 to-primary-foreground/20">
+    <div className="absolute inset-0 p-6 flex flex-col justify-between text-white">
+      {variant === "left" ? (
+        <>
+          <div>
+            <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-xs font-medium mb-3">
+              For Agencies
+            </span>
+            <h3 className="text-xl font-bold mb-2">Partner With Us</h3>
+            <p className="text-sm text-white/80">
+              List your workers on our platform and reach thousands of clients in Lagos.
+            </p>
+          </div>
+          <Link
+            to="/for-agencies"
+            className="inline-flex items-center text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
+          >
+            Learn More <ArrowRight className="h-4 w-4 ml-1" />
+          </Link>
+        </>
+      ) : (
+        <>
+          <div>
+            <span className="inline-block px-3 py-1 rounded-full bg-accent/30 text-xs font-medium mb-3">
+              For Workers
+            </span>
+            <h3 className="text-xl font-bold mb-2">Start Earning Today</h3>
+            <p className="text-sm text-white/80">
+              Join our network of verified professionals and connect with families.
+            </p>
+          </div>
+          <Link
+            to="/for-workers"
+            className="inline-flex items-center text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
+          >
+            Sign Up Now <ArrowRight className="h-4 w-4 ml-1" />
+          </Link>
+        </>
+      )}
+    </div>
+  </div>
+);
+
 const ServicesSection = () => {
+  // Split services: first 3, middle 1, last 3
+  const topRow = services.slice(0, 3);
+  const middleService = services[3]; // Driver
+  const bottomRow = services.slice(4, 7);
+
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="container">
@@ -74,39 +156,24 @@ const ServicesSection = () => {
           </p>
         </div>
 
+        {/* Top Row - 3 Services */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
+          {topRow.map((service, index) => (
+            <ServiceCard key={service.id} service={service} index={index} />
+          ))}
+        </div>
+
+        {/* Middle Row - Advert + 1 Service + Advert */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
+          <AdvertCard variant="left" />
+          <ServiceCard service={middleService} index={3} />
+          <AdvertCard variant="right" />
+        </div>
+
+        {/* Bottom Row - 3 Services */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {services.map((service, index) => (
-            <Link
-              key={service.id}
-              to={`/services/${service.id}`}
-              className="group relative rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-in aspect-[4/3]"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {/* Background Image */}
-              <img
-                src={service.image}
-                alt={service.title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              
-              {/* Gradient Overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-t ${service.color} opacity-60 group-hover:opacity-70 transition-opacity`} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              
-              {/* Content */}
-              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                <h3 className="text-xl font-bold mb-2 group-hover:translate-y-0 transition-transform">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-white/90 mb-3 line-clamp-2">
-                  {service.description}
-                </p>
-                <div className="flex items-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span>Browse Workers</span>
-                  <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
+          {bottomRow.map((service, index) => (
+            <ServiceCard key={service.id} service={service} index={index + 4} />
           ))}
         </div>
       </div>
