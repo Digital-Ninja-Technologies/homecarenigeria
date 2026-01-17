@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PasswordInput } from "@/components/ui/password-input";
 import { 
   Shield, 
   ArrowRight, 
@@ -13,8 +14,7 @@ import {
   MapPin, 
   Briefcase,
   Upload,
-  CheckCircle2,
-  Lock
+  CheckCircle2
 } from "lucide-react";
 import {
   Select,
@@ -286,19 +286,14 @@ const SignupWorker = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="password" 
-                      type="password"
-                      placeholder="Create a password"
-                      className="pl-10"
-                      value={formData.password}
-                      onChange={(e) => updateFormData("password", e.target.value)}
-                      required
-                      minLength={6}
-                    />
-                  </div>
+                  <PasswordInput
+                    id="password"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={(e) => updateFormData("password", e.target.value)}
+                    required
+                    minLength={6}
+                  />
                 </div>
 
                 <div className="space-y-2">
