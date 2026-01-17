@@ -7,10 +7,12 @@ import TrustSection from "@/components/home/TrustSection";
 import FeaturedWorkersSection from "@/components/home/FeaturedWorkersSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import WorkerCTASection from "@/components/home/WorkerCTASection";
+import PromotionalBanner from "@/components/home/PromotionalBanner";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <PromotionalBanner />
       <Header />
       <main className="flex-1">
         <HeroSection />
