@@ -80,11 +80,14 @@ const Carousel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
       [scrollPrev, scrollNext],
     );
 
-    React.useEffect(() => {
-      if (!api || !setApi) {
-        return;
-      }
+    const lastSetApiRef = React.useRef<CarouselApi | null>(null);
 
+    React.useEffect(() => {
+      if (!api || !setApi) return;
+
+      // Prevent a render loop if the embla `api` instance changes during parent updates.
+      if (lastSetApiRef.current === api) return;
+      lastSetApiRef.current = api;
       setApi(api);
     }, [api, setApi]);
 
