@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WorkerCard from "@/components/workers/WorkerCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, SlidersHorizontal, X, MapPin, Star, Clock, Building2, User } from "lucide-react";
+import { Search, SlidersHorizontal, X, MapPin, Star, Building2, Navigation, Loader2 } from "lucide-react";
 import heroServices from "@/assets/hero-services.jpg";
 import { useParallax } from "@/hooks/useParallax";
-
+import { useGeolocation, getDistanceToLocation, formatDistance } from "@/hooks/useGeolocation";
 const allWorkers = [
   {
     id: "1",
@@ -129,19 +129,68 @@ const Services = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [workerType, setWorkerType] = useState<"all" | "individual" | "agency">("all");
   const [minRating, setMinRating] = useState(0);
+  const [sortBy, setSortBy] = useState<"recommended" | "rating" | "reviews" | "price_low" | "price_high" | "nearest">("recommended");
+  
+  const { latitude, longitude, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
 
-  const filteredWorkers = allWorkers.filter((worker) => {
-    const matchesSearch = worker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      worker.role.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || worker.category === selectedCategory;
-    const matchesLocation = selectedLocation === "All Areas" || worker.location === selectedLocation;
-    const matchesType = workerType === "all" || 
-      (workerType === "agency" && worker.isAgency) || 
-      (workerType === "individual" && !worker.isAgency);
-    const matchesRating = worker.rating >= minRating;
-    
-    return matchesSearch && matchesCategory && matchesLocation && matchesType && matchesRating;
-  });
+  const filteredWorkers = useMemo(() => {
+    let workers = allWorkers.filter((worker) => {
+      const matchesSearch = worker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        worker.role.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === "all" || worker.category === selectedCategory;
+      const matchesLocation = selectedLocation === "All Areas" || worker.location === selectedLocation;
+      const matchesType = workerType === "all" || 
+        (workerType === "agency" && worker.isAgency) || 
+        (workerType === "individual" && !worker.isAgency);
+      const matchesRating = worker.rating >= minRating;
+      
+      return matchesSearch && matchesCategory && matchesLocation && matchesType && matchesRating;
+    });
+
+    // Apply sorting
+    switch (sortBy) {
+      case "rating":
+        workers = [...workers].sort((a, b) => b.rating - a.rating);
+        break;
+      case "reviews":
+        workers = [...workers].sort((a, b) => b.reviews - a.reviews);
+        break;
+      case "price_low":
+        workers = [...workers].sort((a, b) => a.hourlyRate - b.hourlyRate);
+        break;
+      case "price_high":
+        workers = [...workers].sort((a, b) => b.hourlyRate - a.hourlyRate);
+        break;
+      case "nearest":
+        if (latitude !== null && longitude !== null) {
+          workers = [...workers].sort((a, b) => {
+            const distA = getDistanceToLocation(latitude, longitude, a.location);
+            const distB = getDistanceToLocation(latitude, longitude, b.location);
+            return distA - distB;
+          });
+        }
+        break;
+      default:
+        // recommended - keep default order
+        break;
+    }
+
+    return workers;
+  }, [searchQuery, selectedCategory, selectedLocation, workerType, minRating, sortBy, latitude, longitude]);
+
+  // Get distance for display
+  const getWorkerDistance = (location: string): string | null => {
+    if (latitude === null || longitude === null) return null;
+    const distance = getDistanceToLocation(latitude, longitude, location);
+    return formatDistance(distance);
+  };
+
+  const handleSortByNearest = () => {
+    if (latitude === null && longitude === null) {
+      requestLocation();
+    }
+    setSortBy("nearest");
+  };
 
   const [parallaxRef, parallaxStyle] = useParallax<HTMLDivElement>({ speed: 0.15 });
 
@@ -293,30 +342,64 @@ const Services = () => {
 
         {/* Results */}
         <div className="container py-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <p className="text-muted-foreground">
               <span className="font-semibold text-foreground">{filteredWorkers.length}</span> workers found
+              {sortBy === "nearest" && latitude !== null && (
+                <span className="ml-2 text-sm text-primary">• Sorted by distance</span>
+              )}
             </p>
-            <select className="h-9 rounded-lg border border-input bg-background px-3 text-sm">
-              <option>Sort by: Recommended</option>
-              <option>Highest Rated</option>
-              <option>Most Reviews</option>
-              <option>Lowest Price</option>
-              <option>Highest Price</option>
-            </select>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={sortBy === "nearest" ? "default" : "outline"}
+                size="sm"
+                onClick={handleSortByNearest}
+                disabled={geoLoading}
+                className="gap-2"
+              >
+                {geoLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Navigation className="h-4 w-4" />
+                )}
+                Sort by Nearest
+              </Button>
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm"
+              >
+                <option value="recommended">Recommended</option>
+                <option value="rating">Highest Rated</option>
+                <option value="reviews">Most Reviews</option>
+                <option value="price_low">Lowest Price</option>
+                <option value="price_high">Highest Price</option>
+                {latitude !== null && <option value="nearest">Nearest First</option>}
+              </select>
+            </div>
           </div>
+
+          {/* Geolocation status message */}
+          {geoError && sortBy === "nearest" && (
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
+              {geoError}
+            </div>
+          )}
 
           {filteredWorkers.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredWorkers.map((worker, index) => (
-                <div
-                  key={worker.id}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <WorkerCard {...worker} />
-                </div>
-              ))}
+              {filteredWorkers.map((worker, index) => {
+                const distance = getWorkerDistance(worker.location);
+                return (
+                  <div
+                    key={worker.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <WorkerCard {...worker} distance={distance} />
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-16">
