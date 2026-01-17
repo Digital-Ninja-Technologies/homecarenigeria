@@ -64,165 +64,170 @@ const HeroSection = () => {
       </div>
 
       <div className="container relative">
-        <div className="max-w-3xl mx-auto text-center text-white">
-          {/* Trust Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6 animate-fade-in">
-            <Shield className="h-4 w-4 text-accent" />
-            <span className="text-sm font-medium">Verified & Background-Checked Workers</span>
-          </div>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Left Column - Text Content */}
+          <div className="text-white">
+            {/* Trust Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6 animate-fade-in">
+              <Shield className="h-4 w-4 text-accent" />
+              <span className="text-sm font-medium">Verified & Background-Checked Workers</span>
+            </div>
 
-          {/* Headline */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight mb-6 animate-fade-in" style={{
-          animationDelay: "0.1s"
-        }}>
-            Find Trusted Help
-            <br />
-            <span className="text-accent">For Your Home</span>
-          </h1>
+            {/* Headline */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight mb-6 animate-fade-in" style={{
+              animationDelay: "0.1s"
+            }}>
+              Find Trusted Help
+              <br />
+              <span className="text-accent">For Your Home</span>
+            </h1>
 
-          <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto animate-fade-in" style={{
-          animationDelay: "0.2s"
-        }}>
-            Connect with verified nannies, housekeepers, drivers, and caregivers in Lagos. 
-            Background-checked, reviewed, and ready to help.
-          </p>
+            <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl animate-fade-in" style={{
+              animationDelay: "0.2s"
+            }}>
+              Connect with verified nannies, housekeepers, drivers, and caregivers in Lagos. 
+              Background-checked, reviewed, and ready to help.
+            </p>
 
-          {/* Modern Search Box */}
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3 md:p-4 shadow-2xl max-w-2xl mx-auto animate-fade-in border border-white/20" style={{
-          animationDelay: "0.3s"
-        }}>
-            <div className="flex flex-col md:flex-row gap-3">
-              {/* Service Dropdown */}
-              <div className="relative flex-1" ref={serviceRef}>
-                <button 
-                  onClick={() => {
-                    setShowServiceDropdown(!showServiceDropdown);
-                    setShowLocationDropdown(false);
-                  }} 
-                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-secondary/80 text-left text-foreground hover:bg-secondary transition-all duration-200 group border border-transparent hover:border-primary/20"
-                >
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
-                    {selectedServiceData ? <selectedServiceData.icon className="h-5 w-5" /> : <Search className="h-5 w-5" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Service</span>
-                    <p className={`text-sm font-semibold truncate ${selectedService ? "text-foreground" : "text-muted-foreground"}`}>
-                      {selectedService || "What do you need?"}
-                    </p>
-                  </div>
-                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showServiceDropdown ? "rotate-180" : ""}`} />
-                </button>
-                
-                {/* Service Dropdown Menu */}
-                <div className={`absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 origin-top ${showServiceDropdown ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"}`}>
-                  <div className="p-2">
-                    {services.map((service, index) => {
-                      const Icon = service.icon;
-                      const isSelected = selectedService === service.name;
-                      return (
-                        <button 
-                          key={service.name} 
-                          onClick={() => {
-                            setSelectedService(service.name);
-                            setShowServiceDropdown(false);
-                          }} 
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${isSelected ? "bg-primary text-primary-foreground" : "hover:bg-muted text-card-foreground"}`}
-                          style={{ animationDelay: `${index * 50}ms` }}
-                        >
-                          <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? "bg-primary-foreground/20" : "bg-primary/10"}`}>
-                            <Icon className={`h-4 w-4 ${isSelected ? "text-primary-foreground" : "text-primary"}`} />
-                          </div>
-                          <span className="flex-1 text-sm font-medium">{service.name}</span>
-                          {isSelected && <Check className="h-4 w-4" />}
-                        </button>
-                      );
-                    })}
-                  </div>
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-4 max-w-md animate-fade-in" style={{
+              animationDelay: "0.4s"
+            }}>
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-2xl md:text-3xl font-bold">
+                  <Users className="h-5 w-5 md:h-6 md:w-6" />
+                  <span>5K+</span>
                 </div>
+                <p className="text-xs md:text-sm text-white/70 mt-1">Verified Workers</p>
               </div>
-
-              {/* Location Dropdown */}
-              <div className="relative flex-1" ref={locationRef}>
-                <button 
-                  onClick={() => {
-                    setShowLocationDropdown(!showLocationDropdown);
-                    setShowServiceDropdown(false);
-                  }} 
-                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-secondary/80 text-left text-foreground hover:bg-secondary transition-all duration-200 group border border-transparent hover:border-primary/20"
-                >
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-all duration-200">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Location</span>
-                    <p className={`text-sm font-semibold truncate ${selectedLocation ? "text-foreground" : "text-muted-foreground"}`}>
-                      {selectedLocation || "Where in Lagos?"}
-                    </p>
-                  </div>
-                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showLocationDropdown ? "rotate-180" : ""}`} />
-                </button>
-                
-                {/* Location Dropdown Menu */}
-                <div className={`absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 origin-top ${showLocationDropdown ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"}`}>
-                  <div className="p-2">
-                    {locations.map((location, index) => {
-                      const isSelected = selectedLocation === location;
-                      return (
-                        <button 
-                          key={location} 
-                          onClick={() => {
-                            setSelectedLocation(location);
-                            setShowLocationDropdown(false);
-                          }} 
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-muted text-card-foreground"}`}
-                          style={{ animationDelay: `${index * 50}ms` }}
-                        >
-                          <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? "bg-accent-foreground/20" : "bg-accent/10"}`}>
-                            <MapPin className={`h-4 w-4 ${isSelected ? "text-accent-foreground" : "text-accent"}`} />
-                          </div>
-                          <span className="flex-1 text-sm font-medium">{location}</span>
-                          {isSelected && <Check className="h-4 w-4" />}
-                        </button>
-                      );
-                    })}
-                  </div>
+              <div className="text-center border-x border-white/20 text-secondary-foreground">
+                <div className="flex items-center justify-center gap-1 text-2xl md:text-3xl font-bold">
+                  <Star className="h-5 w-5 md:h-6 md:w-6 text-premium" />
+                  <span className="text-primary-foreground">4.8</span>
                 </div>
+                <p className="text-xs md:text-sm text-white/70 mt-1">Average Rating</p>
               </div>
-
-              {/* Search Button */}
-              <Button size="lg" className="gap-2 md:px-8 h-auto py-3.5 md:py-0 shadow-lg hover:shadow-xl transition-all duration-200" asChild>
-                <Link to="/services">
-                  <Search className="h-5 w-5" />
-                  <span className="font-semibold">Search</span>
-                </Link>
-              </Button>
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-2xl md:text-3xl font-bold">
+                  <Shield className="h-5 w-5 md:h-6 md:w-6 text-accent" />
+                  <span>100%</span>
+                </div>
+                <p className="text-xs md:text-sm text-white/70 mt-1">Verified</p>
+              </div>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mt-12 max-w-lg mx-auto animate-fade-in" style={{
-          animationDelay: "0.4s"
-        }}>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-2xl md:text-3xl font-bold">
-                <Users className="h-5 w-5 md:h-6 md:w-6" />
-                <span>5K+</span>
+          {/* Right Column - Search Box */}
+          <div className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 md:p-6 shadow-2xl border border-white/20">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Find the perfect help</h2>
+              
+              <div className="flex flex-col gap-3">
+                {/* Service Dropdown */}
+                <div className="relative" ref={serviceRef}>
+                  <button 
+                    onClick={() => {
+                      setShowServiceDropdown(!showServiceDropdown);
+                      setShowLocationDropdown(false);
+                    }} 
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-secondary/80 text-left text-foreground hover:bg-secondary transition-all duration-200 group border border-transparent hover:border-primary/20"
+                  >
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
+                      {selectedServiceData ? <selectedServiceData.icon className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Service</span>
+                      <p className={`text-sm font-semibold truncate ${selectedService ? "text-foreground" : "text-muted-foreground"}`}>
+                        {selectedService || "What do you need?"}
+                      </p>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showServiceDropdown ? "rotate-180" : ""}`} />
+                  </button>
+                  
+                  {/* Service Dropdown Menu */}
+                  <div className={`absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 origin-top ${showServiceDropdown ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"}`}>
+                    <div className="p-2">
+                      {services.map((service, index) => {
+                        const Icon = service.icon;
+                        const isSelected = selectedService === service.name;
+                        return (
+                          <button 
+                            key={service.name} 
+                            onClick={() => {
+                              setSelectedService(service.name);
+                              setShowServiceDropdown(false);
+                            }} 
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${isSelected ? "bg-primary text-primary-foreground" : "hover:bg-muted text-card-foreground"}`}
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? "bg-primary-foreground/20" : "bg-primary/10"}`}>
+                              <Icon className={`h-4 w-4 ${isSelected ? "text-primary-foreground" : "text-primary"}`} />
+                            </div>
+                            <span className="flex-1 text-sm font-medium">{service.name}</span>
+                            {isSelected && <Check className="h-4 w-4" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location Dropdown */}
+                <div className="relative" ref={locationRef}>
+                  <button 
+                    onClick={() => {
+                      setShowLocationDropdown(!showLocationDropdown);
+                      setShowServiceDropdown(false);
+                    }} 
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-secondary/80 text-left text-foreground hover:bg-secondary transition-all duration-200 group border border-transparent hover:border-primary/20"
+                  >
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-all duration-200">
+                      <MapPin className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Location</span>
+                      <p className={`text-sm font-semibold truncate ${selectedLocation ? "text-foreground" : "text-muted-foreground"}`}>
+                        {selectedLocation || "Where in Lagos?"}
+                      </p>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showLocationDropdown ? "rotate-180" : ""}`} />
+                  </button>
+                  
+                  {/* Location Dropdown Menu */}
+                  <div className={`absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 origin-top ${showLocationDropdown ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"}`}>
+                    <div className="p-2">
+                      {locations.map((location, index) => {
+                        const isSelected = selectedLocation === location;
+                        return (
+                          <button 
+                            key={location} 
+                            onClick={() => {
+                              setSelectedLocation(location);
+                              setShowLocationDropdown(false);
+                            }} 
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-muted text-card-foreground"}`}
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? "bg-accent-foreground/20" : "bg-accent/10"}`}>
+                              <MapPin className={`h-4 w-4 ${isSelected ? "text-accent-foreground" : "text-accent"}`} />
+                            </div>
+                            <span className="flex-1 text-sm font-medium">{location}</span>
+                            {isSelected && <Check className="h-4 w-4" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Search Button */}
+                <Button size="lg" className="w-full gap-2 h-12 shadow-lg hover:shadow-xl transition-all duration-200 mt-2" asChild>
+                  <Link to="/services">
+                    <Search className="h-5 w-5" />
+                    <span className="font-semibold">Search Workers</span>
+                  </Link>
+                </Button>
               </div>
-              <p className="text-xs md:text-sm text-white/70 mt-1">Verified Workers</p>
-            </div>
-            <div className="text-center border-x border-white/20 text-secondary-foreground">
-              <div className="flex items-center justify-center gap-1 text-2xl md:text-3xl font-bold">
-                <Star className="h-5 w-5 md:h-6 md:w-6 text-premium" />
-                <span className="text-primary-foreground">4.8</span>
-              </div>
-              <p className="text-xs md:text-sm text-white/70 mt-1">Average Rating</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-2xl md:text-3xl font-bold">
-                <Shield className="h-5 w-5 md:h-6 md:w-6 text-accent" />
-                <span>100%</span>
-              </div>
-              <p className="text-xs md:text-sm text-white/70 mt-1">Verified</p>
             </div>
           </div>
         </div>
