@@ -15,6 +15,7 @@ interface WorkerCardProps {
   isVerified: boolean;
   isAgency: boolean;
   skills: string[];
+  distance?: string | null;
 }
 
 const WorkerCard = ({
@@ -30,6 +31,7 @@ const WorkerCard = ({
   isVerified,
   isAgency,
   skills,
+  distance,
 }: WorkerCardProps) => {
   return (
     <div className="bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50 group">
@@ -90,6 +92,12 @@ const WorkerCard = ({
         <div className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
           <MapPin className="h-3.5 w-3.5" />
           <span>{location}</span>
+          {distance && (
+            <>
+              <span className="mx-1">•</span>
+              <span className="text-primary font-medium">{distance}</span>
+            </>
+          )}
           <span className="mx-1">•</span>
           <span>{experience}</span>
         </div>
