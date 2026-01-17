@@ -45,6 +45,7 @@ const serviceTypes: { id: ServiceCategory; label: string }[] = [
   { id: "driver", label: "Driver" },
   { id: "caregiver", label: "Elderly Caregiver" },
   { id: "tutor", label: "Home Tutor" },
+  { id: "errand", label: "Errand / Personal Assistant" },
 ];
 
 const SignupWorker = () => {
@@ -342,22 +343,22 @@ const SignupWorker = () => {
                   <Label>Services You Offer</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {serviceTypes.map((service) => (
-                      <div
+                      <label
                         key={service.id}
+                        htmlFor={`service-${service.id}`}
                         className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                           formData.services.includes(service.id)
                             ? 'border-accent bg-accent/5'
                             : 'border-border hover:border-accent/50'
                         }`}
-                        onClick={() => toggleService(service.id)}
                       >
                         <Checkbox 
+                          id={`service-${service.id}`}
                           checked={formData.services.includes(service.id)}
-                          onClick={(e) => e.stopPropagation()}
                           onCheckedChange={() => toggleService(service.id)}
                         />
                         <span className="text-sm font-medium">{service.label}</span>
-                      </div>
+                      </label>
                     ))}
                   </div>
                 </div>
