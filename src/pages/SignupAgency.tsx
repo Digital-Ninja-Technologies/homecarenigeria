@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordStrength } from "@/components/ui/password-strength";
 import { 
   Shield, 
   ArrowRight, 
@@ -271,6 +272,7 @@ const SignupAgency = () => {
                     required
                     minLength={6}
                   />
+                  <PasswordStrength password={formData.password} />
                 </div>
 
                 <div className="space-y-2">

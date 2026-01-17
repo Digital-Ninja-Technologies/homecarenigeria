@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordStrength } from "@/components/ui/password-strength";
 import { Shield, Mail, User, MapPin, ArrowRight, ArrowLeft, CheckCircle2, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -246,6 +247,7 @@ const SignupClient = () => {
                     required
                     minLength={6}
                   />
+                  <PasswordStrength password={formData.password} />
                 </div>
 
                 <div className="space-y-2">
