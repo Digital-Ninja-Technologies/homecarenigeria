@@ -222,21 +222,22 @@ export default function WorkerProfile() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {serviceTypes.map((service) => (
-                <div
+                <label
                   key={service.id}
+                  htmlFor={`profile-service-${service.id}`}
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     formData.services.includes(service.id)
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:border-primary/50'
                   }`}
-                  onClick={() => toggleService(service.id)}
                 >
                   <Checkbox 
+                    id={`profile-service-${service.id}`}
                     checked={formData.services.includes(service.id)}
                     onCheckedChange={() => toggleService(service.id)}
                   />
                   <span className="text-sm font-medium">{service.label}</span>
-                </div>
+                </label>
               ))}
             </div>
           </CardContent>
