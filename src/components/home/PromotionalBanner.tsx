@@ -10,7 +10,7 @@ const promotions = [
     title: "New User Special",
     description: "Get ₦2,000 off your first booking",
     cta: "Claim Offer",
-    link: "/signup-client",
+    link: "/signup/client",
     bgClass: "from-accent/20 via-accent/10 to-transparent",
     accentColor: "text-accent",
   },
