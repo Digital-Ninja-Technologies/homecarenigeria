@@ -19,6 +19,7 @@ import SignupAgency from "./pages/SignupAgency";
 import HowItWorks from "./pages/HowItWorks";
 import ForWorkers from "./pages/ForWorkers";
 import ForAgencies from "./pages/ForAgencies";
+import TrustSafety from "./pages/TrustSafety";
 import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import WorkerDashboard from "./pages/dashboard/WorkerDashboard";
 import AgencyDashboard from "./pages/dashboard/AgencyDashboard";
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/our-process" element={<OurProcess />} />
             <Route path="/for-workers" element={<ForWorkers />} />
             <Route path="/for-agencies" element={<ForAgencies />} />
+            <Route path="/trust-safety" element={<TrustSafety />} />
             <Route path="/install" element={<Install />} />
             <Route path="/workers/:id" element={<WorkerDetail />} />
             <Route path="/book/:id" element={<PublicBooking />} />
