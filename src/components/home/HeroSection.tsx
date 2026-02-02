@@ -43,7 +43,7 @@ const HeroSection = () => {
   const selectedServiceData = services.find(s => s.name === selectedService);
   
   return (
-    <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
+    <section className="relative py-16 md:py-24 lg:py-32">
       {/* Background Image with Parallax */}
       <div className="absolute inset-0" ref={parallaxRef}>
         <img
