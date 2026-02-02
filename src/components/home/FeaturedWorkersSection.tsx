@@ -95,7 +95,10 @@ const MockWorkerCard = ({ name, photo, role, experience, location, rating, revie
   };
 
   return (
-    <div className="bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50 group">
+    <div 
+      className="bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50 group cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="relative p-4 pb-0">
         <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-secondary">
           {photo ? (

@@ -1,6 +1,6 @@
 import { Star, Shield, MapPin, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface WorkerCardProps {
   id: string;
@@ -33,8 +33,19 @@ const WorkerCard = ({
   skills,
   distance,
 }: WorkerCardProps) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on buttons
+    if ((e.target as HTMLElement).closest('button, a')) return;
+    navigate(`/workers/${id}`);
+  };
+
   return (
-    <div className="bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50 group">
+    <div 
+      className="bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50 group cursor-pointer"
+      onClick={handleCardClick}
+    >
       {/* Header with Photo */}
       <div className="relative p-4 pb-0">
         <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-secondary">
